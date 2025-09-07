@@ -1,0 +1,1 @@
+public enum SfxEvent { Pellet, PowerPickup, WallHit, Step }

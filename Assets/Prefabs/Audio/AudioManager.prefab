@@ -1,0 +1,88 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &5863820872898996689
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5101733728087340539}
+  - component: {fileID: 8873369504886325465}
+  m_Layer: 0
+  m_Name: AudioManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5101733728087340539
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5863820872898996689}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8873369504886325465
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5863820872898996689}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 78f218dda4860f240b53b9089b7168cf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mixer: {fileID: 24100000, guid: e3d2ba34ed5ad07448567ea0fbbbb30d, type: 2}
+  normalSnapshot: {fileID: 24500006, guid: e3d2ba34ed5ad07448567ea0fbbbb30d, type: 2}
+  frightenedSnapshot: {fileID: 3844109479895766217, guid: e3d2ba34ed5ad07448567ea0fbbbb30d, type: 2}
+  bootLoop: {fileID: 8300000, guid: 30c973ad36274804baf5de8d85a63bab, type: 3}
+  introLoop: {fileID: 8300000, guid: 604041094977cd149bf7c63e2d57be5e, type: 3}
+  normalLoop: {fileID: 8300000, guid: efd67d5810cc6c145ac11a90828c0d5f, type: 3}
+  powerLoop: {fileID: 8300000, guid: c9d39c0502a831843aed09519490b64d, type: 3}
+  killLoop: {fileID: 8300000, guid: 402c2c5bb75aacf45beb36335280c16b, type: 3}
+  levelClear: {fileID: 8300000, guid: 31ba98332ec60a84f924ecbeed0f8241, type: 3}
+  deathLoop: {fileID: 0}
+  defaultFade: 0.63
+  sfxDefs:
+  - eventType: 0
+    clips:
+    - {fileID: 8300000, guid: ae372b6512d69f94e86ade2dd465eeb8, type: 3}
+    volume: 1
+    pitchRange: {x: 1, y: 1}
+    minInterval: 0
+    spatial: 0
+  - eventType: 1
+    clips:
+    - {fileID: 8300000, guid: b88c9c9daa930514396b0d86c64a8ffb, type: 3}
+    volume: 1
+    pitchRange: {x: 1, y: 1}
+    minInterval: 0
+    spatial: 0
+  - eventType: 3
+    clips:
+    - {fileID: 8300000, guid: e8b93cdd581e317428321eed15f6c0e2, type: 3}
+    volume: 1
+    pitchRange: {x: 1, y: 1}
+    minInterval: 0
+    spatial: 0
+  - eventType: 2
+    clips:
+    - {fileID: 8300000, guid: 6d8db903738f56c419b4f69710d77ffb, type: 3}
+    volume: 1
+    pitchRange: {x: 1, y: 1}
+    minInterval: 0
+    spatial: 0
+  sfxVoices: 8
+  sfx3DSpatialBlend: 1
