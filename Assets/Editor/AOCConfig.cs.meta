@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 5457b2cf63e9c62498a4d2bfc6f9ebe2
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - m_ViewDataDictionary: {instanceID: 0}
+  - baseController: {fileID: 9100000, guid: 75a0690b2072f764e9fd9432819ab24a, type: 2}
+  - baseNormal: {fileID: 7400000, guid: df974786558356f4fa23ba90baa79565, type: 2}
+  - redNormal: {fileID: 7400000, guid: 29122e1be5767dd419d26c84ca9d4157, type: 2}
+  - pinkNormal: {fileID: 7400000, guid: 99032c4ac31c9e5429cef0bbb3174d3a, type: 2}
+  - blueOrOrangeNormal: {fileID: 7400000, guid: 03416ade17933d44ca543fc7ae65a85d, type: 2}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
