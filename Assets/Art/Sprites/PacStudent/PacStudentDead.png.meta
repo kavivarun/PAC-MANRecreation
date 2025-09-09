@@ -298,7 +298,15 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      PacStudentDead_0: 757388918499303885
+      PacStudentDead_1: 7026665040094165919
+      PacStudentDead_2: -6645274948809038174
+      PacStudentDead_3: -1882746554402935154
+      PacStudentDead_4: 8389484174074707095
+      PacStudentDead_5: 6597676261563330017
+      PacStudentDead_6: -2162563770553504113
+      PacStudentDead_7: 2648989578488272172
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

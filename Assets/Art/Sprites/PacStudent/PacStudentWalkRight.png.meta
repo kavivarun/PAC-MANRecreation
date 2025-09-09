@@ -202,7 +202,11 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      PacStudentWalkRight_0: 3541582032522906714
+      PacStudentWalkRight_1: -6867791103631530854
+      PacStudentWalkRight_2: 5374057857705333985
+      PacStudentWalkRight_3: -4121331780734189272
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

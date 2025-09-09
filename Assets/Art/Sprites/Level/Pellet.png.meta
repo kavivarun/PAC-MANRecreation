@@ -130,7 +130,8 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      Pellet_0: -8357494700477734146
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
