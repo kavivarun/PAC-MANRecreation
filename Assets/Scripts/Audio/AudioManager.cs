@@ -180,8 +180,11 @@ public class AudioManager : MonoBehaviour
     }
 
     // Public SFX Method
-    public void PlaySfx(SfxEvent evt, Vector3? worldPos = null, float volMul = 1f)
+    public void PlaySfx(SfxEvent evt, GameObject caller = null, Vector3? worldPos = null, float volMul = 1f)
     {
+        if (caller && caller.TryGetComponent<AudioToggle>(out var toggle) && toggle.muteAudio)
+            return;
+
         if (!sfxMap.TryGetValue(evt, out var def) || def.clips == null || def.clips.Length == 0) return;
 
         float now = Time.unscaledTime;
@@ -193,9 +196,6 @@ public class AudioManager : MonoBehaviour
         sfxIndex = (sfxIndex + 1) % sfxPool.Length;
 
         src.spatialBlend = def.spatial ? sfx3DSpatialBlend : 0f;
-        if (def.spatial && worldPos.HasValue) src.transform.position = worldPos.Value;
-        else src.transform.localPosition = Vector3.zero;
-
         src.pitch = Random.Range(def.pitchRange.x, def.pitchRange.y);
         src.PlayOneShot(clip, def.volume * Mathf.Clamp01(volMul));
     }

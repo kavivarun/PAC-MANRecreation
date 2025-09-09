@@ -2812,6 +2812,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4921530675378750402, guid: fa8d7a7ad02394f4394b03c944108c0c, type: 3}
+      propertyPath: muteAudio
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6920773867023545661, guid: fa8d7a7ad02394f4394b03c944108c0c, type: 3}
       propertyPath: pathCorners.Array.data[0].x
       value: -3.5
