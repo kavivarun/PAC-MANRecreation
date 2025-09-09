@@ -14,8 +14,9 @@ GameObject:
   - component: {fileID: 989651673293593122}
   - component: {fileID: 7461323335569740277}
   - component: {fileID: 2535261113220965477}
+  - component: {fileID: 7771489472886676509}
   m_Layer: 0
-  m_Name: RedGhost
+  m_Name: PurpleGhostShowcase
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -131,7 +132,7 @@ Animator:
   m_GameObject: {fileID: 3649424176375972369}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 22100000, guid: 547eb3d6a408cbf40a2a6c7ceccc0257, type: 2}
+  m_Controller: {fileID: 22100000, guid: 8e32c2c5bd0e8874da34300e5ddd4364, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -186,7 +187,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: -8293842954131872675, guid: 55378f9a1d937ed499e06a52b8c39c1a, type: 3}
+  m_Sprite: {fileID: -2509442644804387239, guid: caa8eeaf099a43840bcdf45733a31ae2, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -197,6 +198,23 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &7771489472886676509
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3649424176375972369}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 04df255b3a6856340b03c51e15b9760b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  faceHoldSeconds: 1
+  betweenDelay: 0.2
+  frightenedSeconds: 2
+  deadSeconds: 2
+  loop: 1
 --- !u!1 &9096406978776520659
 GameObject:
   m_ObjectHideFlags: 0

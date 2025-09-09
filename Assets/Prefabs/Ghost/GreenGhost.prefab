@@ -30,7 +30,7 @@ Transform:
   m_GameObject: {fileID: 3649424176375972369}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 4.953842, y: -4.2249775, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -83,8 +83,8 @@ MonoBehaviour:
   - {fileID: -7955549447708035181, guid: acacf1eb48b93c643b128142a4df1017, type: 3}
   - {fileID: -3820453755886233992, guid: 7c0c9099059f29e4391a7342bd7610c1, type: 3}
   - {fileID: 4676404957367620803, guid: c6352705ff5d5c946997e02b3dc4be4f, type: 3}
-  idleThreshold: 0.01
-  baseAnimSpeed: 3.5
+  animator: {fileID: 0}
+  useVelocityForEyes: 1
 --- !u!58 &989651673293593122
 CircleCollider2D:
   m_ObjectHideFlags: 0

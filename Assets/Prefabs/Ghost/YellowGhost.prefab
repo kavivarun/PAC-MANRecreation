@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 7461323335569740277}
   - component: {fileID: 2535261113220965477}
   m_Layer: 0
-  m_Name: RedGhost
+  m_Name: YellowGhost
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -131,7 +131,7 @@ Animator:
   m_GameObject: {fileID: 3649424176375972369}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 22100000, guid: 547eb3d6a408cbf40a2a6c7ceccc0257, type: 2}
+  m_Controller: {fileID: 22100000, guid: a3e19c6baa762444aa82b0ce2d0debc6, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -186,7 +186,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: -8293842954131872675, guid: 55378f9a1d937ed499e06a52b8c39c1a, type: 3}
+  m_Sprite: {fileID: -443480061153203788, guid: e29348ea3ef6a6a4e9c503e18df5baf0, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
