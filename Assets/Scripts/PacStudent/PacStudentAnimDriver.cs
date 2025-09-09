@@ -30,7 +30,10 @@ public class PacStudentAnimDriver : MonoBehaviour
             rb.interpolation = RigidbodyInterpolation2D.Interpolate;
         }
     }
-
+    public void OnStep()
+    {
+        AudioManager.I?.PlaySfx(SfxEvent.Step, gameObject);
+    }
     void Update()
     {
         // If dead, keep the animator running so the death clip plays.
