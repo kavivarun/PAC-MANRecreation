@@ -9,21 +9,21 @@ public class LevelGenerator : MonoBehaviour
     [SerializeField]
     private int[,] levelMap = new int[,]
     {
-        {1,2,2,2,2,2,2,2,2,2,2,2,2,7},
-        {2,5,5,5,5,5,5,5,5,5,5,5,5,4},
-        {2,5,3,4,4,3,5,3,4,4,4,3,5,4},
-        {2,6,4,0,0,4,5,4,0,0,0,4,5,4},
-        {2,5,3,4,4,3,5,3,4,4,4,3,5,3},
-        {2,5,5,5,5,5,5,5,5,5,5,5,5,5},
-        {2,5,3,4,4,3,5,3,3,5,3,4,4,4},
-        {2,5,3,4,4,3,5,4,4,5,3,4,4,3},
-        {2,5,5,5,5,5,5,4,4,5,5,5,5,4},
-        {1,2,2,2,2,1,5,4,3,4,4,3,0,4},
-        {0,0,0,0,0,2,5,4,3,4,4,3,0,3},
-        {0,0,0,0,0,2,5,4,4,0,0,0,0,0},
-        {0,0,0,0,0,2,5,4,4,0,3,4,4,8},
-        {2,2,2,2,2,1,5,3,3,0,4,0,0,0},
-        {0,0,0,0,0,0,5,0,0,0,4,0,0,0},
+{1,2,2,2,2,2,2,2,2,2,2,2,2,7},
+{2,5,5,5,5,5,5,5,5,5,5,5,5,4},
+{2,5,3,4,4,3,5,3,4,4,4,3,5,4},
+{2,6,4,0,0,4,5,4,0,0,0,4,5,4},
+{2,5,3,4,4,3,5,3,4,4,4,3,5,3},
+{2,5,5,5,5,5,5,5,5,5,5,5,5,5},
+{2,5,3,4,4,3,5,3,3,5,3,4,4,4},
+{2,5,3,4,4,3,5,4,4,5,3,4,4,3},
+{2,5,5,5,5,5,5,4,4,5,5,5,5,4},
+{1,2,2,2,2,1,5,4,3,4,4,3,0,4},
+{0,0,0,0,0,2,5,4,3,4,4,3,0,3},
+{0,0,0,0,0,2,5,4,4,0,0,0,0,0},
+{0,0,0,0,0,2,5,4,4,0,3,4,4,8},
+{2,2,2,2,2,1,5,3,3,0,4,0,0,0},
+{0,0,0,0,0,0,5,0,0,0,4,0,0,0},
     };
 
     [Header("Prefabs by Type Id")]
@@ -256,12 +256,13 @@ public class LevelGenerator : MonoBehaviour
 
     private static float CornerRotationRobust(int[,] map, int x, int y, int m)
     {
+        bool Conn(int id) => id == 1 || id == 2 || id == 7 || id == 3 || id == 4 || id == 8;
         // If all 4 sides are connected, decide by which opposite diagonal is OPEN.
         if (PopCount4(m) == 4)
         {
             int rows = map.GetLength(0);
             int cols = map.GetLength(1);
-            bool Conn(int id) => id == 1 || id == 2 || id == 7 || id == 3 || id == 4 || id == 8;
+
 
             bool UL = (x > 0 && y > 0) && Conn(map[y - 1, x - 1]);
             bool UR = (x < cols - 1 && y > 0) && Conn(map[y - 1, x + 1]);
@@ -272,9 +273,37 @@ public class LevelGenerator : MonoBehaviour
             if (!UR) return 90f;  
             if (!DR) return 0;  
             if (!DL) return 270f;   
-
-            // All diagonals filled too → deterministic fallback
             return 0f;
+        }
+        // If 3 sides are connected, decide by diagonal of only the available permutations
+        if (PopCount4(m) == 3)
+        {
+            int rows = map.GetLength(0);
+            int cols = map.GetLength(1);
+            bool UL = ((x > 0 && y > 0) && Conn(map[y - 1, x - 1]))||x==0||y==0;
+            bool UR = ((x < cols - 1 && y > 0) && Conn(map[y - 1, x + 1]))|| x == cols - 1 || y == 0;
+            bool DR = ((x < cols - 1 && y < rows - 1) && Conn(map[y + 1, x + 1])) || x == cols - 1 || y == rows -1;
+            bool DL = ((x > 0 && y < rows - 1) && Conn(map[y + 1, x - 1])) || x == 0 || y == rows - 1;
+            bool u = (m & 1) != 0, r = (m & 2) != 0, d = (m & 4) != 0, l = (m & 8) != 0;
+
+            if (!u) // missing Up 
+            {
+                if (!DL && DR) return 270f;
+                if (DL && !DR) return 0f;
+            }
+            if (!r) // missing Right 
+            {
+                if (!DL && UL) return 270f;
+                if (DL && !UL) return 180f;
+            }
+            if (!d) // missing Down 
+            {
+                if (!UL && UR) return 180f;
+                if (UL && !UR) return 90f;
+            }
+            // missing Left
+            if (!UR && DR) return 90f;
+            if (UR && !DR) return 0f;
         }
 
         // Adjacent-pair checks (Up=1, Right=2, Down=4, Left=8)
@@ -286,7 +315,6 @@ public class LevelGenerator : MonoBehaviour
         return 0f;
     }
 
-    // Wall default assumed horizontal at 0°.
     private static float WallRotationRobust(int m)
     {
         int horiz = ((m & 2) != 0 ? 1 : 0) + ((m & 8) != 0 ? 1 : 0);
@@ -296,34 +324,40 @@ public class LevelGenerator : MonoBehaviour
 
     private static Quaternion TJunctionRotation(int[,] map, int x, int y)
     {
-        int rows = map.GetLength(0);
-        int cols = map.GetLength(1);
+        int rows = map.GetLength(0), cols = map.GetLength(1);
+        bool IsInside(int id) => id == 3 || id == 4;
 
-        int m = 0;
-        bool Conn(int id) => id == 1 || id == 2 || id == 7 || id == 3 || id == 4 || id == 8;
+        bool tLeft = x > 0 && map[y, x - 1] == 7;
+        bool tRight = x < cols - 1 && map[y, x + 1] == 7;
+        bool tUp = y > 0 && map[y - 1, x] == 7;
+        bool tDown = y < rows - 1 && map[y + 1, x] == 7;
 
-        if (y > 0 && Conn(map[y - 1, x])) m |= 1;
-        if (x < cols - 1 && Conn(map[y, x + 1])) m |= 2;
-        if (y < rows - 1 && Conn(map[y + 1, x])) m |= 4;
-        if (x > 0 && Conn(map[y, x - 1])) m |= 8;
-        bool u = (m & 1) != 0, r = (m & 2) != 0, d = (m & 4) != 0, l = (m & 8) != 0;
+        if (tLeft || tRight)
+        {
+            bool insideUp = y > 0 && IsInside(map[y - 1, x]);
+            bool insideDown = y < rows - 1 && IsInside(map[y + 1, x]);
 
-        float zRot;
-        if (l && r && d) zRot = 0f;      // L + R + D
-        else if (l && r && u) zRot = 180f; // L + R + U
-        else if (r && u && d) zRot = 90f;  // R + U + D
-        else zRot = 270f;                  // U + D + L
+            Quaternion rot = Quaternion.identity;              
+            if (tLeft) rot *= Quaternion.Euler(0f, 180f, 0f);  
+            if (insideUp && !insideDown) rot *= Quaternion.Euler(180f, 0f, 0f); 
+            return rot;
+        }
 
-        Quaternion rot = Quaternion.Euler(0f, 0f, zRot);
+        if (tUp || tDown)
+        {
+            bool insideRight = x < cols - 1 && IsInside(map[y, x + 1]);
+            bool insideLeft = x > 0 && IsInside(map[y, x - 1]);
 
-        if (x >= cols / 2 && zRot != 90f && zRot != 270f) rot *= Quaternion.Euler(0f, 180f, 0f); // right half
-        if (y >= rows / 2 && zRot != 0f && zRot != 180f) rot *= Quaternion.Euler(180f, 0f, 0f); // bottom half
+            Quaternion rot = Quaternion.Euler(0f, 0f, 90f);    
+            if (tUp) rot *= Quaternion.Euler(0f, 180f, 0f);    
+            if (insideLeft && !insideRight) rot *= Quaternion.Euler(180f, 0f, 0f);
+            return rot;
+        }
 
-        return rot;
+        return Quaternion.identity;
     }
 
 
-    // Gate: default 0° horizontal; rotate 90° if vertical is stronger.
     private static float GateRotationFromMask(int m)
     {
         int horiz = ((m & 2) != 0 ? 1 : 0) + ((m & 8) != 0 ? 1 : 0);
