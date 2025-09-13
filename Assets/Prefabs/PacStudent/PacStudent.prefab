@@ -46,7 +46,7 @@ Rigidbody2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8027504428889851781}
-  m_BodyType: 0
+  m_BodyType: 1
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
@@ -207,11 +207,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   pathCorners:
-  - {x: -3.5, y: 8.45, z: 0}
-  - {x: 1.5, y: 8.45, z: 0}
-  - {x: 1.5, y: 4.45, z: 0}
-  - {x: -3.5, y: 4.45, z: 0}
-  moveSpeed: 2
+  - {x: -7, y: 7, z: -2}
+  - {x: 3, y: 7, z: -2}
+  - {x: 3, y: -1, z: -2}
+  - {x: -7, y: -1, z: -2}
+  moveSpeed: 3
+  snapEps: 0.001
 --- !u!114 &412272508475481664
 MonoBehaviour:
   m_ObjectHideFlags: 0
