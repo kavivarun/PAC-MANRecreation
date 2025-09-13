@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 6893300802990671056}
   - component: {fileID: 7790175229356453606}
   - component: {fileID: 6459707367719215689}
-  - component: {fileID: 5111822304422540224}
+  - component: {fileID: 7608888889992713695}
   m_Layer: 0
   m_Name: PacStudentShowcase
   m_TagString: Untagged
@@ -210,7 +210,7 @@ MonoBehaviour:
   betweenDelay: 0.1
   deathStateName: PacStudentDie
   deathFallbackSeconds: 1.5
---- !u!114 &5111822304422540224
+--- !u!114 &7608888889992713695
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -219,7 +219,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 8027504428889851781}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a6775126ce128a8469a3003c6ee79e26, type: 3}
+  m_Script: {fileID: 11500000, guid: 4bbc801c59ad9a14580e3c63f435622f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   muteAudio: 1
