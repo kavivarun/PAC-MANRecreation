@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 2190874170330460974}
   - component: {fileID: 6066826870178631758}
   m_Layer: 0
-  m_Name: PowerPellet
+  m_Name: PowerPelletLarge
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -97,11 +97,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1103375778644226197, guid: 4c808a790091ae0449bd12d7d225e4db, type: 3}
       propertyPath: m_LocalScale.x
-      value: 1
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 1103375778644226197, guid: 4c808a790091ae0449bd12d7d225e4db, type: 3}
       propertyPath: m_LocalScale.y
-      value: 1
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 1103375778644226197, guid: 4c808a790091ae0449bd12d7d225e4db, type: 3}
       propertyPath: m_LocalPosition.x

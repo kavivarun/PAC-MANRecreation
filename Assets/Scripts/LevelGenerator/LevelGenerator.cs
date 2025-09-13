@@ -9,21 +9,21 @@ public class LevelGenerator : MonoBehaviour
     [SerializeField]
     private int[,] levelMap = new int[,]
     {
-{1,2,2,2,2,2,2,2,2,2,2,2,2,7},
-{2,5,5,5,5,5,5,5,5,5,5,5,5,4},
-{2,5,3,4,4,3,5,3,4,4,4,3,5,4},
-{2,6,4,0,0,4,5,4,0,0,0,4,5,4},
-{2,5,3,4,4,3,5,3,4,4,4,3,5,3},
-{2,5,5,5,5,5,5,5,5,5,5,5,5,5},
-{2,5,3,4,4,3,5,3,3,5,3,4,4,4},
-{2,5,3,4,4,3,5,4,4,5,3,4,4,3},
-{2,5,5,5,5,5,5,4,4,5,5,5,5,4},
-{1,2,2,2,2,1,5,4,3,4,4,3,0,4},
-{0,0,0,0,0,2,5,4,3,4,4,3,0,3},
-{0,0,0,0,0,2,5,4,4,0,0,0,0,0},
-{0,0,0,0,0,2,5,4,4,0,3,4,4,8},
-{2,2,2,2,2,1,5,3,3,0,4,0,0,0},
-{0,0,0,0,0,0,5,0,0,0,4,0,0,0},
+        {1,2,2,2,2,2,2,2,2,2,2,2,2,7},
+        {2,5,5,5,5,5,5,5,5,5,5,5,5,4},
+        {2,5,3,4,4,3,5,3,4,4,4,3,5,4},
+        {2,6,4,0,0,4,5,4,0,0,0,4,5,4},
+        {2,5,3,4,4,3,5,3,4,4,4,3,5,3},
+        {2,5,5,5,5,5,5,5,5,5,5,5,5,5},
+        {2,5,3,4,4,3,5,3,3,5,3,4,4,4},
+        {2,5,3,4,4,3,5,4,4,5,3,4,4,3},
+        {2,5,5,5,5,5,5,4,4,5,5,5,5,4},
+        {1,2,2,2,2,1,5,4,3,4,4,3,0,4},
+        {0,0,0,0,0,2,5,4,3,4,4,3,0,3},
+        {0,0,0,0,0,2,5,4,4,0,0,0,0,0},
+        {0,0,0,0,0,2,5,4,4,0,3,4,4,8},
+        {2,2,2,2,2,1,5,3,3,0,4,0,0,0},
+        {0,0,0,0,0,0,5,0,0,0,4,0,0,0},
     };
 
     [Header("Prefabs by Type Id")]
@@ -61,38 +61,6 @@ public class LevelGenerator : MonoBehaviour
         int[,] full = BuildFullMap(levelMap);
         Generate(full);
         FitCameraTo(full);
-        if (pacStudentPrefab)
-            SpawnPacStudent(full);
-    }
-
-    private void SpawnPacStudent(int[,] map)
-    {
-        int rows = map.GetLength(0);
-        int cols = map.GetLength(1);
-
-        float width = cols * tileSize;
-        float height = rows * tileSize;
-
-        // Top-left world position of the map
-        Vector3 topLeft = new Vector3(
-            spawnOrigin.x,
-            spawnOrigin.y,
-            0f
-        );
-
-        // Define rectangle corners clockwise
-        Vector3[] corners = new Vector3[4];
-        corners[0] = topLeft + new Vector3(tileSize * 0.5f, -tileSize * 0.5f, 0f);         // top-left tile center
-        corners[1] = topLeft + new Vector3(width - tileSize * 0.5f, -tileSize * 0.5f, 0f); // top-right
-        corners[2] = topLeft + new Vector3(width - tileSize * 0.5f, -(height - tileSize * 0.5f), 0f); // bottom-right
-        corners[3] = topLeft + new Vector3(tileSize * 0.5f, -(height - tileSize * 0.5f), 0f); // bottom-left
-
-        // Instantiate PacStudent
-        var pac = Instantiate(pacStudentPrefab, corners[0], Quaternion.identity);
-        var mover = pac.GetComponent<PacStudentMover>();
-        if (mover)
-            mover.GetType().GetField("pathCorners", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
-                ?.SetValue(mover, corners);
     }
 
     //Mirroring 
@@ -231,8 +199,6 @@ public class LevelGenerator : MonoBehaviour
             }
         }
     }
-
-    private enum TileFamily { Outside, Inside }
 
     // Build a neighbor mask but ONLY for the given family to avoid cross-family pollution.
     // Bits: Up=1, Right=2, Down=4, Left=8

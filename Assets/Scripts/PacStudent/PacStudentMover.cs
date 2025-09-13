@@ -1,63 +1,55 @@
-using System.Collections;
-using UnityEngine;
+﻿using UnityEngine;
 
 [RequireComponent(typeof(PacStudentAnimDriver))]
 public class PacStudentMover : MonoBehaviour
 {
-    [Header("Path Settings")]
-    [SerializeField] private Vector3[] pathCorners;  
-    [SerializeField] private float moveSpeed = 2f;   
+    [SerializeField] private Vector3[] pathCorners;  // TL → TR → BR → BL in clockwise order
+    [SerializeField] private float moveSpeed = 2f;
+    [SerializeField] private float snapEps = 0.001f;
 
     private PacStudentAnimDriver animDriver;
-    private int targetIndex = 0;
+    private Tweener tweener;
+    private int idx;
 
     void Awake()
     {
         animDriver = GetComponent<PacStudentAnimDriver>();
-        animDriver.driveFromVelocity = false; 
+        animDriver.driveFromVelocity = false;
+        tweener = Tweener.FindFirstObjectByType<Tweener>();
     }
 
     void Start()
     {
-        if (pathCorners == null || pathCorners.Length < 2)
-        {
-            Debug.LogError("[PacStudentMover] Please assign at least 2 path points.");
-            enabled = false;
-            return;
-        }
-
-        transform.position = pathCorners[0];
-        targetIndex = 1; 
-        SetFacing(pathCorners[targetIndex] - transform.position);
+        if (tweener == null || pathCorners == null || pathCorners.Length < 4) { enabled = false; return; }
+        idx = 0;
+        transform.position = pathCorners[idx];
+        StartNextMovement();
     }
 
     void Update()
     {
-        if (pathCorners == null || pathCorners.Length == 0) return;
+        if (!tweener.TweenExists(transform)) StartNextMovement();
+    }
 
-        // Move linearly towards the target corner
-        Vector3 targetPos = pathCorners[targetIndex];
-        Vector3 moveDir = (targetPos - transform.position).normalized;
-        transform.position += moveDir * moveSpeed * Time.deltaTime;
+    private void StartNextMovement()
+    {
+        int next = (idx + 1) % pathCorners.Length;
+        Vector3 a = pathCorners[idx];
+        Vector3 b = pathCorners[next];
+        Vector3 d = b - a;
 
-        SetFacing(moveDir);
+        if (d.sqrMagnitude <= snapEps * snapEps) { idx = next; return; }
 
-        if (Vector3.Distance(transform.position, targetPos) < 0.05f)
-        {
-            transform.position = targetPos; 
-            targetIndex = (targetIndex + 1) % pathCorners.Length; 
-        }
+        SetFacing(d);
+        float duration = d.magnitude / Mathf.Max(0.0001f, moveSpeed);
+        if (tweener.AddTween(transform, a, b, duration)) idx = next;
     }
 
     private void SetFacing(Vector3 dir)
     {
         if (Mathf.Abs(dir.x) > Mathf.Abs(dir.y))
-        {
             animDriver.SetFacing(dir.x > 0 ? PacStudentAnimDriver.Dir.Right : PacStudentAnimDriver.Dir.Left);
-        }
         else
-        {
             animDriver.SetFacing(dir.y > 0 ? PacStudentAnimDriver.Dir.Up : PacStudentAnimDriver.Dir.Down);
-        }
     }
 }
