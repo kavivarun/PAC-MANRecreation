@@ -14,7 +14,6 @@ GameObject:
   - component: {fileID: 6254392866469582286}
   - component: {fileID: 6893300802990671056}
   - component: {fileID: 7790175229356453606}
-  - component: {fileID: 6920773867023545661}
   - component: {fileID: 412272508475481664}
   m_Layer: 6
   m_Name: PacStudent
@@ -194,25 +193,6 @@ MonoBehaviour:
   driveFromVelocity: 1
   moveAlways: 1
   deathStateName: PacStudentDie
---- !u!114 &6920773867023545661
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8027504428889851781}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 77501b8818ea52f448afdc3df55de429, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  pathCorners:
-  - {x: -7, y: 7, z: -2}
-  - {x: 3, y: 7, z: -2}
-  - {x: 3, y: -1, z: -2}
-  - {x: -7, y: -1, z: -2}
-  moveSpeed: 3
-  snapEps: 0.001
 --- !u!114 &412272508475481664
 MonoBehaviour:
   m_ObjectHideFlags: 0
