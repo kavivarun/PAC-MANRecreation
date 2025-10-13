@@ -6,10 +6,10 @@ public class PacStudentController : MonoBehaviour
     public float moveSpeed = 6f;
     public float cellSize = 1f;
     public float snapEps = 0.01f;
-    public float teleportCooldown = 0.2f; // delay before another teleport
+    public float teleportCooldown = 0.2f;
 
     private Vector2Int gridPos;
-    private Vector2Int lastInput = Vector2Int.right;
+    private Vector2Int lastInput = Vector2Int.zero;
     private Vector2Int currentInput = Vector2Int.zero;
 
     private Tweener tweener;
@@ -31,6 +31,7 @@ public class PacStudentController : MonoBehaviour
         gridPos = level.WorldToGrid(transform.position);
         transform.position = level.GridToWorld(gridPos);
         SetFacing(Vector2Int.right);
+        animDriver.StopAnimation();
     }
 
     void Update()
@@ -42,7 +43,6 @@ public class PacStudentController : MonoBehaviour
         {
             transform.position = level.GridToWorld(gridPos);
 
-            // Handle teleport on arrival (with cooldown)
             if (Time.time - lastTeleportTime > teleportCooldown)
             {
                 if ((level.GetTile(gridPos) & TileFlags.Teleporter) != 0 &&
@@ -62,8 +62,9 @@ public class PacStudentController : MonoBehaviour
                 if (TryBeginMove(currentInput)) return;
             }
 
-            if (TryBeginMove(lastInput)) return;
-            if (TryBeginMove(currentInput)) return;
+            // Only attempt movement if there is active input
+            if (lastInput != Vector2Int.zero && TryBeginMove(lastInput)) return;
+            if (currentInput != Vector2Int.zero && TryBeginMove(currentInput)) return;
 
             animDriver.StopAnimation();
             currentInput = Vector2Int.zero;
@@ -76,10 +77,15 @@ public class PacStudentController : MonoBehaviour
 
     private void ReadInput()
     {
-        if (Input.GetKeyDown(KeyCode.W)) lastInput = Vector2Int.up;
-        else if (Input.GetKeyDown(KeyCode.S)) lastInput = Vector2Int.down;
-        else if (Input.GetKeyDown(KeyCode.A)) lastInput = Vector2Int.left;
-        else if (Input.GetKeyDown(KeyCode.D)) lastInput = Vector2Int.right;
+        Vector2Int newInput = Vector2Int.zero;
+
+        if (Input.GetKeyDown(KeyCode.W)) newInput = Vector2Int.up;
+        else if (Input.GetKeyDown(KeyCode.S)) newInput = Vector2Int.down;
+        else if (Input.GetKeyDown(KeyCode.A)) newInput = Vector2Int.left;
+        else if (Input.GetKeyDown(KeyCode.D)) newInput = Vector2Int.right;
+
+        if (newInput != Vector2Int.zero)
+            lastInput = newInput;
     }
 
     private bool TryBeginMove(Vector2Int dir)
