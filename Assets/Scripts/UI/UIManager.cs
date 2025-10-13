@@ -6,7 +6,7 @@ using static AudioManager;
 
 public class UIManager : MonoBehaviour
 {
-    private static UIManager I;
+    public static UIManager I;
     void Awake()
     {
         if (I != null) { Destroy(gameObject); return; }
@@ -28,5 +28,11 @@ public class UIManager : MonoBehaviour
     public void LoadUpgrades()
     {
         SceneManager.LoadScene("UpgradesScene");
+    }
+
+    public void LoadMainMenu()
+    {
+        SceneManager.LoadScene("StartScene");
+        AudioManager.I.OnGameStateChanged(GameState.Boot);
     }
 }
