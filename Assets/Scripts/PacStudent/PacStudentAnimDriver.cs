@@ -34,6 +34,11 @@ public class PacStudentAnimDriver : MonoBehaviour
             animator.speed = 1f;
     }
 
+    public void OnStep()
+    {
+        AudioManager.I?.PlaySfx(SfxEvent.Step, gameObject);
+    }
+
     public void SetFacing(Dir dir)
     {
         switch (dir)

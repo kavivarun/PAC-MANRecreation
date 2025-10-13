@@ -6,6 +6,7 @@ public class PacStudentController : MonoBehaviour
     public float moveSpeed = 6f;
     public float cellSize = 1f;
     public float snapEps = 0.01f;
+    public float teleportCooldown = 0.2f; // delay before another teleport
 
     private Vector2Int gridPos;
     private Vector2Int lastInput = Vector2Int.right;
@@ -16,6 +17,7 @@ public class PacStudentController : MonoBehaviour
 
     private bool hasPendingTeleport;
     private Vector2Int pendingTeleportDest;
+    private float lastTeleportTime = -999f;
 
     void Awake()
     {
@@ -34,11 +36,23 @@ public class PacStudentController : MonoBehaviour
     void Update()
     {
         ReadInput();
+        var level = TilemapLevel.I;
 
         if (!tweener.TweenExists(transform))
         {
-            var level = TilemapLevel.I;
             transform.position = level.GridToWorld(gridPos);
+
+            // Handle teleport on arrival (with cooldown)
+            if (Time.time - lastTeleportTime > teleportCooldown)
+            {
+                if ((level.GetTile(gridPos) & TileFlags.Teleporter) != 0 &&
+                    level.TryTeleport(gridPos, out var dest))
+                {
+                    gridPos = dest;
+                    transform.position = level.GridToWorld(gridPos);
+                    lastTeleportTime = Time.time;
+                }
+            }
 
             if (hasPendingTeleport)
             {
@@ -75,13 +89,6 @@ public class PacStudentController : MonoBehaviour
         var level = TilemapLevel.I;
         Vector2Int next = gridPos + dir;
         if (!level.IsWalkableForPlayer(gridPos, next)) return false;
-
-        if ((level.GetTile(gridPos) & TileFlags.Teleporter) != 0 &&
-            level.TryTeleport(gridPos, out var dest))
-        {
-            hasPendingTeleport = true;
-            pendingTeleportDest = dest;
-        }
 
         Vector3 a = level.GridToWorld(gridPos);
         Vector3 b = level.GridToWorld(next);
