@@ -30,7 +30,6 @@ public class PacStudentTester : MonoBehaviour
         if (!driver) { Debug.LogError("[PacStudentTester] Prefab missing PacStudentAnimDriver"); yield break; }
 
         // Let the driver be param-driven (no RB), keep anims running
-        driver.driveFromVelocity = false;
         driver.moveAlways = true;
 
         while (true)

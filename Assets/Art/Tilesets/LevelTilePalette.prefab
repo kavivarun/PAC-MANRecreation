@@ -8351,8 +8351,8 @@ Tilemap:
   m_TileObjectToInstantiateArray: []
   m_AnimationFrameRate: 1
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_Origin: {x: -8, y: -25, z: 0}
-  m_Size: {x: 31, y: 36, z: 1}
+  m_Origin: {x: -5, y: -24, z: 0}
+  m_Size: {x: 28, y: 29, z: 1}
   m_TileAnchor: {x: 0.5, y: 0.5, z: 0}
   m_TileOrientation: 0
   m_TileOrientationMatrix:
@@ -8485,7 +8485,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.5, y: 0.5, z: 1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 5946989108024195413}
@@ -8555,6 +8555,10 @@ PrefabInstance:
       propertyPath: m_ExcludeLayers.m_Bits
       value: 64
       objectReference: {fileID: 0}
+    - target: {fileID: 7178450405749306384, guid: 4c808a790091ae0449bd12d7d225e4db, type: 3}
+      propertyPath: m_DynamicOccludee
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8445229892080261641, guid: 4c808a790091ae0449bd12d7d225e4db, type: 3}
       propertyPath: m_Name
       value: PowerPellet 2
@@ -8615,6 +8619,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1103375778644226197, guid: 4c808a790091ae0449bd12d7d225e4db, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7178450405749306384, guid: 4c808a790091ae0449bd12d7d225e4db, type: 3}
+      propertyPath: m_DynamicOccludee
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8445229892080261641, guid: 4c808a790091ae0449bd12d7d225e4db, type: 3}
@@ -8679,6 +8687,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7178450405749306384, guid: 4c808a790091ae0449bd12d7d225e4db, type: 3}
+      propertyPath: m_DynamicOccludee
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8445229892080261641, guid: 4c808a790091ae0449bd12d7d225e4db, type: 3}
       propertyPath: m_Name
       value: PowerPellet 3
@@ -8741,6 +8753,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7178450405749306384, guid: 4c808a790091ae0449bd12d7d225e4db, type: 3}
+      propertyPath: m_DynamicOccludee
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8445229892080261641, guid: 4c808a790091ae0449bd12d7d225e4db, type: 3}
       propertyPath: m_Name
       value: PowerPellet
@@ -8755,7 +8771,7 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 1103375778644226197, guid: 4c808a790091ae0449bd12d7d225e4db, type: 3}
   m_PrefabInstance: {fileID: 7280988082241737623}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &1131004895504837262
+--- !u!114 &1863203004834847437
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

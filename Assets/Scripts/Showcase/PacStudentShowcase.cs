@@ -24,7 +24,6 @@ public class PacStudentShowcase : MonoBehaviour
     IEnumerator Run()
     {
         // Force showcase mode
-        driver.driveFromVelocity = false;
         driver.moveAlways = true;
 
         while (true)
