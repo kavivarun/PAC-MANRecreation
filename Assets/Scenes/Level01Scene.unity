@@ -339,8 +339,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 120
-  m_fontSizeBase: 120
+  m_fontSize: 100
+  m_fontSizeBase: 100
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -1598,8 +1598,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 72
-  m_fontSizeBase: 72
+  m_fontSize: 60
+  m_fontSizeBase: 60
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -2655,6 +2655,7 @@ MonoBehaviour:
   moveSpeed: 4
   cellSize: 0.8
   snapEps: 0.01
+  teleportCooldown: 0.2
 --- !u!4 &1451216541 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7169421167842600339, guid: 61438769099f33045bc0a9fe79438911, type: 3}
