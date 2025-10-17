@@ -109,7 +109,11 @@ public class AudioManager : MonoBehaviour
             case GameState.Boot:
                 clip = bootLoop; break;
             case GameState.Intro:
-                clip = introLoop; break;
+                StopMusic();
+                PlayStinger(introLoop);
+                if (introLoop != null)
+                    StartCoroutine(CoAfterIntro(introLoop.length));
+                break;
             case GameState.Playing:
                 clip = normalLoop; break;
             case GameState.PowerMode:
@@ -118,11 +122,11 @@ public class AudioManager : MonoBehaviour
                 clip = killLoop; break;
             case GameState.LevelCleared:
                 StopMusic();
-                PlayStinger(levelClear); 
+                PlayStinger(levelClear);
                 return;
             case GameState.Dying:
                 StopMusic();
-                PlayStinger(deathLoop);   
+                PlayStinger(deathLoop);
                 return;
         }
 
@@ -198,6 +202,11 @@ public class AudioManager : MonoBehaviour
         src.spatialBlend = def.spatial ? sfx3DSpatialBlend : 0f;
         src.pitch = Random.Range(def.pitchRange.x, def.pitchRange.y);
         src.PlayOneShot(clip, def.volume * Mathf.Clamp01(volMul));
+    }
+    IEnumerator CoAfterIntro(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        OnGameStateChanged(GameState.Playing);
     }
 
     // Volume helpers

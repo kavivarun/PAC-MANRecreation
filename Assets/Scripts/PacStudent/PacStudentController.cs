@@ -19,6 +19,10 @@ public class PacStudentController : MonoBehaviour
     private Vector2Int pendingTeleportDest;
     private float lastTeleportTime = -999f;
 
+    [SerializeField] private WallTilemapController wallTilemap;
+    private Vector2Int? lastWallHitDir = null;
+    private Vector2Int facingDir = Vector2Int.right;
+
     void Awake()
     {
         tweener = Tweener.FindFirstObjectByType<Tweener>();
@@ -62,7 +66,6 @@ public class PacStudentController : MonoBehaviour
                 if (TryBeginMove(currentInput)) return;
             }
 
-            // Only attempt movement if there is active input
             if (lastInput != Vector2Int.zero && TryBeginMove(lastInput)) return;
             if (currentInput != Vector2Int.zero && TryBeginMove(currentInput)) return;
 
@@ -94,7 +97,32 @@ public class PacStudentController : MonoBehaviour
 
         var level = TilemapLevel.I;
         Vector2Int next = gridPos + dir;
-        if (!level.IsWalkableForPlayer(gridPos, next)) return false;
+        bool isWall = !level.IsWalkableForPlayer(gridPos, next);
+
+        if (isWall)
+        {
+            if (lastWallHitDir != dir && dir == facingDir)
+            {
+                Vector3 hitPos = level.GridToWorld(next) - new Vector3(dir.x * 0.25f, dir.y * 0.25f, 0f);
+                if (wallTilemap != null)
+                    wallTilemap.PlayWallHit(hitPos);
+                AudioManager.I?.PlaySfx(SfxEvent.WallHit, gameObject);
+
+                Vector3 wobbleStart = transform.position;
+                Vector3 wobbleEnd = wobbleStart + new Vector3(dir.x * 0.2f, dir.y * 0.2f, 0f);
+                float wobbleTime = 0.05f;
+                if (!tweener.TweenExists(transform))
+                {
+                    tweener.AddTween(transform, wobbleStart, wobbleEnd, wobbleTime);
+                    tweener.AddTween(transform, wobbleEnd, wobbleStart, wobbleTime);
+                }
+
+                lastWallHitDir = dir;
+            }
+            return false;
+        }
+
+        lastWallHitDir = null;
 
         Vector3 a = level.GridToWorld(gridPos);
         Vector3 b = level.GridToWorld(next);
@@ -113,6 +141,7 @@ public class PacStudentController : MonoBehaviour
 
     private void SetFacing(Vector2Int dir)
     {
+        facingDir = dir;
         if (Mathf.Abs(dir.x) > Mathf.Abs(dir.y))
             animDriver.SetFacing(dir.x > 0 ? PacStudentAnimDriver.Dir.Right : PacStudentAnimDriver.Dir.Left);
         else
