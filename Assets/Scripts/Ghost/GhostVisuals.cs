@@ -5,12 +5,11 @@ public class GhostVisuals : MonoBehaviour
     [SerializeField] private SpriteRenderer body;
     [SerializeField] private SpriteRenderer eyes;
     [SerializeField] private Sprite[] eyesDir = new Sprite[4]; // [Right, Up, Left, Down]
-    [SerializeField] private Animator animator;                 // auto-finds if left empty
+    [SerializeField] private Animator animator;                
     [SerializeField] private bool useVelocityForEyes = true;
 
-    private Rigidbody2D rb;
 
-    // Animator params (we WRITE these; logic uses local state)
+    // Animator params
     private static readonly int P_IsFrightened = Animator.StringToHash("IsFrightened");
     private static readonly int P_IsDead = Animator.StringToHash("IsDead");
     private static readonly int P_IsNormal = Animator.StringToHash("IsNormal");
@@ -19,39 +18,49 @@ public class GhostVisuals : MonoBehaviour
     private enum VisualState { Normal, Frightened, Dead }
     private VisualState state = VisualState.Normal;
 
+    private Vector3 lastPosition;
+    private Vector3 velocity;
+
     private int lastDir = 0;
 
     void Awake()
     {
-        rb = GetComponent<Rigidbody2D>();
         if (!animator) animator = GetComponent<Animator>() ?? GetComponentInChildren<Animator>(true);
         if (!animator) { Debug.LogError($"[GhostVisuals] No Animator on {name}"); enabled = false; return; }
+
+        lastPosition = transform.position;
     }
 
     void OnEnable() => ApplyState();
 
     void Update()
     {
+        velocity = (transform.position - lastPosition) / Time.deltaTime;
+        lastPosition = transform.position;
+
         animator.speed = 1f; // always animate
-        var v = rb ? rb.velocity : Vector2.zero;
-        animator.SetFloat(P_Speed, v.magnitude);
+
+        animator.SetFloat(P_Speed, velocity.magnitude);
 
         bool showEyes = state == VisualState.Normal;
         if (eyes) eyes.enabled = showEyes;
 
         if (showEyes && eyesDir != null && eyesDir.Length == 4)
         {
-            int dir = useVelocityForEyes ? DirFromVelocity(v, lastDir) : lastDir;
-            if (dir != lastDir) { lastDir = dir; eyes.sprite = eyesDir[dir]; }
+            int dir = useVelocityForEyes ? DirFromVelocity(velocity, lastDir) : lastDir;
+            if (dir != lastDir)
+            {
+                lastDir = dir;
+                eyes.sprite = eyesDir[dir];
+            }
         }
     }
 
-    // --- Public API ---
+    // Public API
     public void EnterNormal() => SetState(VisualState.Normal);
     public void EnterFrightened(bool on = true) => SetState(on ? VisualState.Frightened : VisualState.Normal);
     public void EnterDead(bool on = true) => SetState(on ? VisualState.Dead : VisualState.Normal);
 
-    // Call if you don’t want velocity-based eyes; dir: 0=Right,1=Up,2=Left,3=Down
     public void SetDirection(int dir)
     {
         lastDir = Mathf.Clamp(dir, 0, 3);
@@ -59,7 +68,7 @@ public class GhostVisuals : MonoBehaviour
             eyes.sprite = eyesDir[lastDir];
     }
 
-    // --- Internals ---
+    // Internal Methods
     private void SetState(VisualState s)
     {
         state = s;

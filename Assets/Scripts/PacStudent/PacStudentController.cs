@@ -3,6 +3,8 @@ using UnityEngine;
 [RequireComponent(typeof(PacStudentAnimDriver))]
 public class PacStudentController : MonoBehaviour
 {
+    public static PacStudentController I { get; private set; }
+
     public float moveSpeed = 6f;
     public float cellSize = 1f;
     public float snapEps = 0.01f;
@@ -23,8 +25,11 @@ public class PacStudentController : MonoBehaviour
     private Vector2Int? lastWallHitDir = null;
     private Vector2Int facingDir = Vector2Int.right;
 
+    private Vector3 spawnPosition;
+
     void Awake()
     {
+        I = this;
         tweener = Tweener.FindFirstObjectByType<Tweener>();
         animDriver = GetComponent<PacStudentAnimDriver>();
     }
@@ -34,12 +39,15 @@ public class PacStudentController : MonoBehaviour
         var level = TilemapLevel.I;
         gridPos = level.WorldToGrid(transform.position);
         transform.position = level.GridToWorld(gridPos);
+        spawnPosition = transform.position;
         SetFacing(Vector2Int.right);
         animDriver.StopAnimation();
     }
 
     void Update()
     {
+        if (animDriver.IsDead) return;
+
         ReadInput();
         var level = TilemapLevel.I;
 
@@ -146,5 +154,28 @@ public class PacStudentController : MonoBehaviour
             animDriver.SetFacing(dir.x > 0 ? PacStudentAnimDriver.Dir.Right : PacStudentAnimDriver.Dir.Left);
         else
             animDriver.SetFacing(dir.y > 0 ? PacStudentAnimDriver.Dir.Up : PacStudentAnimDriver.Dir.Down);
+    }
+
+    public void StopMovement()
+    {
+        if (tweener != null) tweener.CancelTween(transform);
+        lastInput = Vector2Int.zero;
+        currentInput = Vector2Int.zero;
+    }
+
+    public void Respawn()
+    {
+        tweener.CancelTween(transform);
+
+        gridPos = TilemapLevel.I.WorldToGrid(spawnPosition);
+        transform.position = spawnPosition;
+        lastInput = Vector2Int.zero;
+        currentInput = Vector2Int.zero;
+        hasPendingTeleport = false;
+        lastWallHitDir = null;
+        facingDir = Vector2Int.right;
+        animDriver.StopAnimation();
+        animDriver.SetFacing(PacStudentAnimDriver.Dir.Right);
+        lastTeleportTime = -999f;
     }
 }

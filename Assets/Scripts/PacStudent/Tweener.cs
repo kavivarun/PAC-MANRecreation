@@ -30,6 +30,17 @@ public class Tweener : MonoBehaviour
         return true;
     }
 
+    public void CancelTween(Transform target)
+    {
+        for (int i = activeTweens.Count - 1; i >= 0; i--)
+        {
+            if (activeTweens[i].Target == target)
+            {
+                activeTweens.RemoveAt(i);
+            }
+        }
+    }
+
     void Update()
     {
         if (activeTweens.Count == 0) return;
@@ -38,9 +49,13 @@ public class Tweener : MonoBehaviour
         for (int i = activeTweens.Count - 1; i >= 0; i--)
         {
             var tw = activeTweens[i];
+            if (tw.Target == null)
+            {
+                activeTweens.RemoveAt(i);
+                continue;
+            }
             float t = Mathf.Clamp01((now - tw.StartTime) / tw.Duration);
             tw.Target.position = Vector3.LerpUnclamped(tw.StartPos, tw.EndPos, t);
-
             if (t >= 1f)
             {
                 tw.Target.position = tw.EndPos;
@@ -48,4 +63,5 @@ public class Tweener : MonoBehaviour
             }
         }
     }
+
 }

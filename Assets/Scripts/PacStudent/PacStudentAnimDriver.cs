@@ -1,7 +1,10 @@
+using System.Collections;
 using UnityEngine;
 
 public class PacStudentAnimDriver : MonoBehaviour
 {
+    public static PacStudentAnimDriver I { get; private set; }
+
     [SerializeField] private Animator animator;
     [SerializeField] private bool moveAlways = true;
     [SerializeField] private string deathStateName = "PacStudentDie";
@@ -15,11 +18,13 @@ public class PacStudentAnimDriver : MonoBehaviour
 
     Vector2 externalFacing = Vector2.right;
 
+    public bool IsDead => animator != null && animator.GetBool(P_IsDead);
+
     void Awake()
     {
+        I = this;
         if (!animator) animator = GetComponent<Animator>();
-        if (dustEffect != null)
-            dustEffect.Stop();
+        if (dustEffect != null) dustEffect.Stop();
     }
 
     void Update()
@@ -34,17 +39,14 @@ public class PacStudentAnimDriver : MonoBehaviour
         animator.SetFloat(P_MoveX, externalFacing.x);
         animator.SetFloat(P_MoveY, externalFacing.y);
 
-        if (moveAlways)
-            animator.speed = 1f;
+        if (moveAlways) animator.speed = 1f;
 
         if (dustEffect != null)
         {
             bool isMoving = animator.speed > 0.01f;
 
-            if (isMoving && !dustEffect.isPlaying)
-                dustEffect.Play();
-            else if (!isMoving && dustEffect.isPlaying)
-                dustEffect.Stop();
+            if (isMoving && !dustEffect.isPlaying) dustEffect.Play();
+            else if (!isMoving && dustEffect.isPlaying) dustEffect.Stop();
 
             UpdateDustOrientation();
         }
@@ -59,22 +61,10 @@ public class PacStudentAnimDriver : MonoBehaviour
 
         switch (GetCurrentDirection())
         {
-            case Dir.Up:
-                offset = new Vector3(0.2f, -0.2f, 0);
-                rotationZ = 0f;
-                break;
-            case Dir.Down:
-                offset = new Vector3(-0.2f, -0.2f, 0);
-                rotationZ = 180f;
-                break;
-            case Dir.Left:
-                offset = new Vector3(0f, -0.3f, 0);
-                rotationZ = 90f;
-                break;
-            case Dir.Right:
-                offset = new Vector3(0f, -0.3f, 0);
-                rotationZ = -90f;
-                break;
+            case Dir.Up: offset = new Vector3(0.2f, -0.2f, 0); rotationZ = 0f; break;
+            case Dir.Down: offset = new Vector3(-0.2f, -0.2f, 0); rotationZ = 180f; break;
+            case Dir.Left: offset = new Vector3(0f, -0.3f, 0); rotationZ = 90f; break;
+            default: offset = new Vector3(0f, -0.3f, 0); rotationZ = -90f; break;
         }
 
         dustEffect.transform.localPosition = offset;
@@ -90,10 +80,7 @@ public class PacStudentAnimDriver : MonoBehaviour
         return Dir.Right;
     }
 
-    public void OnStep()
-    {
-        AudioManager.I?.PlaySfx(SfxEvent.Step, gameObject);
-    }
+    public void OnStep() => AudioManager.I?.PlaySfx(SfxEvent.Step, gameObject);
 
     public void SetFacing(Dir dir)
     {
@@ -113,8 +100,7 @@ public class PacStudentAnimDriver : MonoBehaviour
     {
         animator.speed = 1f;
         animator.SetBool(P_IsDead, true);
-        if (!string.IsNullOrEmpty(deathStateName))
-            animator.CrossFadeInFixedTime(deathStateName, 0.05f, 0);
+        //if (!string.IsNullOrEmpty(deathStateName)) animator.Play(deathStateName, 0, 0f);
         StopDust();
     }
 
@@ -130,14 +116,10 @@ public class PacStudentAnimDriver : MonoBehaviour
         StopDust();
     }
 
-    public void StartAnimation()
-    {
-        animator.speed = 1f;
-    }
+    public void StartAnimation() => animator.speed = 1f;
 
     void StopDust()
     {
-        if (dustEffect != null && dustEffect.isPlaying)
-            dustEffect.Stop();
+        if (dustEffect != null && dustEffect.isPlaying) dustEffect.Stop();
     }
 }

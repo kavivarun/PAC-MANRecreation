@@ -118,7 +118,7 @@ public class AudioManager : MonoBehaviour
                 clip = normalLoop; break;
             case GameState.PowerMode:
                 clip = powerLoop; snap = frightenedSnapshot; break;
-            case GameState.Chase:
+            case GameState.AlienDead:
                 clip = killLoop; break;
             case GameState.LevelCleared:
                 StopMusic();

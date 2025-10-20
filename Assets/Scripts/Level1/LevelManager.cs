@@ -1,5 +1,6 @@
 using System.Collections;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEditor.Overlays;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -19,6 +20,16 @@ public class LevelManager : MonoBehaviour
     [SerializeField] private TMP_Text scoreText;
     [SerializeField] private Transform livesContainer;
     [SerializeField] private GameObject lifeIconPrefab;
+    [SerializeField] private GameObject ghostTimer;
+    [SerializeField] private TMP_Text ghostTimerText;
+
+    [Header("Ghost Scared Settings")]
+    [SerializeField] private float scaredDuration = 10f;
+    [SerializeField] private float recoverTime = 3f;
+
+    private Coroutine scaredTimerRoutine;
+    private float scaredTimeRemaining;
+    public bool IsGhostsScared => scaredTimeRemaining > 0f;
 
     [Header("Cherry Controller")]
     [SerializeField] private GameObject cherryControllerPrefab;
@@ -121,6 +132,49 @@ public class LevelManager : MonoBehaviour
         timerText.text = $"TIMER : {minutes:00}:{seconds:00}:{millis:00}";
     }
 
+    public void StartGhostScaredTimer()
+    {
+        if (scaredTimerRoutine != null)
+            StopCoroutine(scaredTimerRoutine);
+        scaredTimerRoutine = StartCoroutine(GhostScaredTimerRoutine());
+    }
+
+    IEnumerator GhostScaredTimerRoutine()
+    {
+        scaredTimeRemaining = scaredDuration;
+        ghostTimer?.gameObject.SetActive(true);
+
+        GameManager.I.SetState(GameState.PowerMode);
+        foreach (GhostStateManager g in FindObjectsByType<GhostStateManager>(FindObjectsSortMode.None))
+            g.EnterScared();
+
+        while (scaredTimeRemaining > 0f)
+        {
+            scaredTimeRemaining -= Time.deltaTime;
+            int minutes = Mathf.FloorToInt(scaredTimeRemaining / 60f);
+            int seconds = Mathf.FloorToInt(scaredTimeRemaining % 60f);
+            int millis = Mathf.FloorToInt((scaredTimeRemaining * 100f) % 100f);
+
+            ghostTimerText.text = $"Ghosts Scared: {minutes:00}:{seconds:00}:{millis:00}";
+
+            if (scaredTimeRemaining <= recoverTime)
+            {
+                foreach (GhostStateManager g in FindObjectsByType<GhostStateManager>(FindObjectsSortMode.None))
+                    g.EnterRecovering();
+            }
+
+            yield return null;
+        }
+
+        ghostTimer?.gameObject.SetActive(false);
+        foreach (GhostStateManager g in FindObjectsByType<GhostStateManager>(FindObjectsSortMode.None))
+            if (g.CurrentState != GhostStateManager.GhostState.Dead)
+                g.EnterNormal();
+
+        GameManager.I.SetState(GameState.Playing);
+        scaredTimerRoutine = null;
+    }
+
     public void LoseLife()
     {
         if (IsGameOver ) return;
@@ -136,8 +190,18 @@ public class LevelManager : MonoBehaviour
     IEnumerator RespawnRoutine()
     {
         timerRunning = false;
-        yield return new WaitForSeconds(2f);
-        StartCoroutine(StartRoundCountdown());
+
+        if (PacStudentController.I != null)
+            PacStudentController.I.StopMovement();         
+
+        if (PacStudentAnimDriver.I != null)
+        {
+            PacStudentAnimDriver.I.PlayDeath();
+            yield return new WaitForSeconds(2f);      
+            PacStudentAnimDriver.I.ClearDeath();           
+        }
+
+        PacStudentController.I?.Respawn();                 
     }
 
     public void CheckForGameOverCondition(bool allPelletsCleared)

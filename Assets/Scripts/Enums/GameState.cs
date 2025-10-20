@@ -1,4 +1,4 @@
 public enum GameState
 {
-    Boot, Intro, Playing, PowerMode, Chase, LevelCleared, Dying, Paused
+    Boot, Intro, Playing, PowerMode, AlienDead, LevelCleared, Dying, Paused
 }

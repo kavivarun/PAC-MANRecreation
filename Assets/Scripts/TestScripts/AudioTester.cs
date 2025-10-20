@@ -18,7 +18,7 @@ public class AudioTester : MonoBehaviour
             AudioManager.I.OnGameStateChanged(GameState.PowerMode);
 
         if (Input.GetKeyDown(KeyCode.Alpha5))
-            AudioManager.I.OnGameStateChanged(GameState.Chase);
+            AudioManager.I.OnGameStateChanged(GameState.AlienDead);
 
         if (Input.GetKeyDown(KeyCode.Alpha6))
             AudioManager.I.OnGameStateChanged(GameState.LevelCleared);

@@ -8,30 +8,27 @@ public class CherryController : MonoBehaviour
     [SerializeField] private float moveDuration = 8f;
 
     private Tweener tweener;
-    private GameObject currentCherry;
     private Camera mainCam;
+    private bool canSpawn = true;
+    private Coroutine disableCoroutine;
 
     void Start()
     {
         tweener = FindFirstObjectByType<Tweener>();
         mainCam = Camera.main;
-
-        currentCherry = Instantiate(cherryPrefab);
-        currentCherry.SetActive(false);
-        currentCherry.GetComponent<SpriteRenderer>().sortingOrder = 20;
-
         StartCoroutine(SpawnAfterDelay(spawnDelay));
     }
 
     IEnumerator SpawnAfterDelay(float delay)
     {
         yield return new WaitForSeconds(delay);
-        SpawnCherry();
+        if (canSpawn)
+            SpawnCherry();
     }
 
     void SpawnCherry()
     {
-        if (!currentCherry || !tweener || !mainCam)
+        if (!cherryPrefab || !tweener || !mainCam)
             return;
 
         Vector3 center = mainCam.ViewportToWorldPoint(new Vector3(0.5f, 0.5f, 0));
@@ -47,18 +44,37 @@ public class CherryController : MonoBehaviour
         startPos.z = 0;
         endPos.z = 0;
 
-        currentCherry.transform.position = startPos;
-        currentCherry.SetActive(true);
+        GameObject cherry = Instantiate(cherryPrefab, startPos, Quaternion.identity);
+        cherry.GetComponent<SpriteRenderer>().sortingOrder = 20;
 
-        tweener.AddTween(currentCherry.transform, startPos, endPos, moveDuration);
-        StartCoroutine(DisableAfter(moveDuration));
+        Cherry cherryScript = cherry.GetComponent<Cherry>();
+        cherryScript.OnCollected += HandleCherryCollected;
+
+        tweener.AddTween(cherry.transform, startPos, endPos, moveDuration);
+        disableCoroutine = StartCoroutine(DisableAfter(cherry, moveDuration));
     }
 
-    IEnumerator DisableAfter(float duration)
+    IEnumerator DisableAfter(GameObject cherry, float duration)
     {
         yield return new WaitForSeconds(duration);
-        if (currentCherry)
-            currentCherry.SetActive(false);
+        if (cherry)
+            Destroy(cherry);
         StartCoroutine(SpawnAfterDelay(spawnDelay));
+    }
+
+    void HandleCherryCollected(GameObject cherry)
+    {
+        if (disableCoroutine != null)
+            StopCoroutine(disableCoroutine);
+
+        if (cherry)
+            Destroy(cherry);
+
+        StartCoroutine(SpawnAfterDelay(spawnDelay));
+    }
+
+    void OnDestroy()
+    {
+        canSpawn = false;
     }
 }
