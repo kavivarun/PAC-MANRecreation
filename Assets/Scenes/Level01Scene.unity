@@ -2305,7 +2305,7 @@ MonoBehaviour:
     m_Bottom: 0
   m_ChildAlignment: 3
   m_Spacing: 2
-  m_ChildForceExpandWidth: 1
+  m_ChildForceExpandWidth: 0
   m_ChildForceExpandHeight: 1
   m_ChildControlWidth: 0
   m_ChildControlHeight: 0
@@ -2957,11 +2957,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 3125573872358764460, guid: 18ac59f1248ab9242a700a6db07edab9, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -1.98
+      value: -6.85
       objectReference: {fileID: 0}
     - target: {fileID: 3125573872358764460, guid: 18ac59f1248ab9242a700a6db07edab9, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -1.07
+      value: 3.61
       objectReference: {fileID: 0}
     - target: {fileID: 3125573872358764460, guid: 18ac59f1248ab9242a700a6db07edab9, type: 3}
       propertyPath: m_LocalPosition.z

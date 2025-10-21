@@ -1268,6 +1268,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   key: L1HighScore
+  valueType: 0
   output: {fileID: 673332577}
   defaultValue: 0
 --- !u!114 &673332577
@@ -1629,6 +1630,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   key: L2HighScore
+  valueType: 2
   output: {fileID: 825502965}
   defaultValue: 0
 --- !u!114 &825502965
@@ -2974,6 +2976,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   key: L1BestTime
+  valueType: 3
   output: {fileID: 1646029754}
   defaultValue: 
 --- !u!114 &1646029754

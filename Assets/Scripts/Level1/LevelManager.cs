@@ -198,10 +198,12 @@ public class LevelManager : MonoBehaviour
         {
             PacStudentAnimDriver.I.PlayDeath();
             yield return new WaitForSeconds(2f);      
-            PacStudentAnimDriver.I.ClearDeath();           
+            PacStudentAnimDriver.I.ClearDeath();   
+            GameManager.I.SetState(GameState.Playing);
         }
 
-        PacStudentController.I?.Respawn();                 
+        PacStudentController.I?.Respawn();
+        timerRunning = true;
     }
 
     public void CheckForGameOverCondition(bool allPelletsCleared)
@@ -215,7 +217,14 @@ public class LevelManager : MonoBehaviour
         IsGameOver = true;
         timerRunning = false;
 
-        if (cherryControllerInstance != null)
+        if (PacStudentController.I != null)
+            PacStudentController.I.StopMovement();
+        if (PacStudentAnimDriver.I != null)
+        {
+            PacStudentAnimDriver.I.PlayDeath();
+            yield return new WaitForSeconds(2f);
+        }
+            if (cherryControllerInstance != null)
         {
             Destroy(cherryControllerInstance);
             cherryControllerInstance = null;
@@ -226,8 +235,9 @@ public class LevelManager : MonoBehaviour
         AudioManager.I?.OnGameStateChanged(GameState.LevelCleared);
         SaveIfBestScore();
 
-        yield return new WaitForSeconds(3f);
+        yield return new WaitForSeconds(6f);
         SceneManager.LoadScene("StartScene");
+        GameManager.I.SetState(GameState.Boot);
     }
 
     void SaveIfBestScore()

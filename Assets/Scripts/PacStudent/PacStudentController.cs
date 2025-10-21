@@ -101,6 +101,7 @@ public class PacStudentController : MonoBehaviour
 
     private bool TryBeginMove(Vector2Int dir)
     {
+        if (animDriver.IsDead) return false;
         if (dir == Vector2Int.zero) return false;
 
         var level = TilemapLevel.I;
@@ -166,7 +167,6 @@ public class PacStudentController : MonoBehaviour
     public void Respawn()
     {
         tweener.CancelTween(transform);
-
         gridPos = TilemapLevel.I.WorldToGrid(spawnPosition);
         transform.position = spawnPosition;
         lastInput = Vector2Int.zero;
@@ -174,6 +174,7 @@ public class PacStudentController : MonoBehaviour
         hasPendingTeleport = false;
         lastWallHitDir = null;
         facingDir = Vector2Int.right;
+        animDriver.ClearDeath();
         animDriver.StopAnimation();
         animDriver.SetFacing(PacStudentAnimDriver.Dir.Right);
         lastTeleportTime = -999f;

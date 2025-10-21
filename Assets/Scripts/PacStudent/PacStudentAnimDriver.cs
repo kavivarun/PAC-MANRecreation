@@ -29,7 +29,7 @@ public class PacStudentAnimDriver : MonoBehaviour
 
     void Update()
     {
-        if (animator.GetBool(P_IsDead))
+        if (IsDead)
         {
             animator.speed = 1f;
             StopDust();
@@ -100,7 +100,7 @@ public class PacStudentAnimDriver : MonoBehaviour
     {
         animator.speed = 1f;
         animator.SetBool(P_IsDead, true);
-        //if (!string.IsNullOrEmpty(deathStateName)) animator.Play(deathStateName, 0, 0f);
+        if (!string.IsNullOrEmpty(deathStateName)) animator.Play(deathStateName, 0, 0f);
         StopDust();
     }
 
