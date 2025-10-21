@@ -25,12 +25,13 @@ public class PacStudentController : MonoBehaviour
     private Vector2Int? lastWallHitDir = null;
     private Vector2Int facingDir = Vector2Int.right;
 
-    private Vector3 spawnPosition;
 
     void Awake()
     {
         I = this;
         tweener = Tweener.FindFirstObjectByType<Tweener>();
+        if (wallTilemap == null)
+            wallTilemap = FindFirstObjectByType<WallTilemapController>();
         animDriver = GetComponent<PacStudentAnimDriver>();
     }
 
@@ -39,16 +40,14 @@ public class PacStudentController : MonoBehaviour
         var level = TilemapLevel.I;
         gridPos = level.WorldToGrid(transform.position);
         transform.position = level.GridToWorld(gridPos);
-        spawnPosition = transform.position;
         SetFacing(Vector2Int.right);
         animDriver.StopAnimation();
     }
 
     void Update()
     {
-        if (animDriver.IsDead) return;
-
-        ReadInput();
+        if (animDriver.IsDead || GameManager.I.CurrentState == GameState.LevelCleared) return;
+            ReadInput();
         var level = TilemapLevel.I;
 
         if (!tweener.TweenExists(transform))
@@ -164,11 +163,19 @@ public class PacStudentController : MonoBehaviour
         currentInput = Vector2Int.zero;
     }
 
-    public void Respawn()
+    public void StopAnimation()
+    {
+        if (animDriver != null)
+        {
+            animDriver.StopAnimation();
+        }
+    }
+
+    public void Respawn(Vector3 spawnPos)
     {
         tweener.CancelTween(transform);
-        gridPos = TilemapLevel.I.WorldToGrid(spawnPosition);
-        transform.position = spawnPosition;
+        gridPos = TilemapLevel.I.WorldToGrid(spawnPos);
+        transform.position = spawnPos;
         lastInput = Vector2Int.zero;
         currentInput = Vector2Int.zero;
         hasPendingTeleport = false;

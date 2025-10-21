@@ -2,6 +2,7 @@ using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.Tilemaps;
 using UnityEngine.UI;
 
 public class LevelManager : MonoBehaviour
@@ -32,6 +33,26 @@ public class LevelManager : MonoBehaviour
 
     [Header("Cherry Controller")]
     [SerializeField] private GameObject cherryControllerPrefab;
+
+    [Header("Spawn Tilemaps")]
+    [SerializeField] private Tilemap pacStudentSpawn;
+    [SerializeField] private Tilemap redGhostSpawn;
+    [SerializeField] private Tilemap pinkGhostSpawn;
+    [SerializeField] private Tilemap yellowGhostSpawn;
+    [SerializeField] private Tilemap greenGhostSpawn;
+
+    [Header("Character Prefabs")]
+    [SerializeField] private GameObject pacStudentPrefab;
+    [SerializeField] private GameObject redGhostPrefab;
+    [SerializeField] private GameObject pinkGhostPrefab;
+    [SerializeField] private GameObject yellowGhostPrefab;
+    [SerializeField] private GameObject greenGhostPrefab;
+
+    [Header("Ghost Canvases")]
+    [SerializeField] private CanvasFollower redGhostCanvas;
+    [SerializeField] private CanvasFollower pinkGhostCanvas;
+    [SerializeField] private CanvasFollower yellowGhostCanvas;
+    [SerializeField] private CanvasFollower greenGhostCanvas;
 
     public int CurrentScore { get; private set; }
     public int HighScore { get; private set; }
@@ -80,10 +101,50 @@ public class LevelManager : MonoBehaviour
     void StartRound()
     {
         GameManager.I?.SetState(GameState.Playing);
+
+        if (pacStudentPrefab != null && pacStudentSpawn != null)
+        {
+            Vector3 pos = GetTilemapCenter(pacStudentSpawn);
+            Instantiate(pacStudentPrefab, pos, Quaternion.identity);
+        }
+
+        GameObject red = null, pink = null, yellow = null, green = null;
+
+        if (redGhostPrefab != null && redGhostSpawn != null)
+            red = Instantiate(redGhostPrefab, GetTilemapCenter(redGhostSpawn), Quaternion.identity);
+
+        if (pinkGhostPrefab != null && pinkGhostSpawn != null)
+            pink = Instantiate(pinkGhostPrefab, GetTilemapCenter(pinkGhostSpawn), Quaternion.identity);
+
+        if (yellowGhostPrefab != null && yellowGhostSpawn != null)
+            yellow = Instantiate(yellowGhostPrefab, GetTilemapCenter(yellowGhostSpawn), Quaternion.identity);
+
+        if (greenGhostPrefab != null && greenGhostSpawn != null)
+            green = Instantiate(greenGhostPrefab, GetTilemapCenter(greenGhostSpawn), Quaternion.identity);
+
+        if (red != null && redGhostCanvas != null)
+            redGhostCanvas.SetTarget(red.transform);
+        if (pink != null && pinkGhostCanvas != null)
+            pinkGhostCanvas.SetTarget(pink.transform);
+        if (yellow != null && yellowGhostCanvas != null)
+            yellowGhostCanvas.SetTarget(yellow.transform);
+        if (green != null && greenGhostCanvas != null)
+            greenGhostCanvas.SetTarget(green.transform);
+
         if (cherryControllerPrefab != null)
             cherryControllerInstance = Instantiate(cherryControllerPrefab);
+
         timerRunning = true;
         timer = 0f;
+    }
+
+    private Vector3 GetTilemapCenter(Tilemap tilemap)
+    {
+        if (tilemap == null) return Vector3.zero;
+        foreach (Vector3Int pos in tilemap.cellBounds.allPositionsWithin)
+            if (tilemap.HasTile(pos))
+                return tilemap.GetCellCenterWorld(pos);
+        return Vector3.zero;
     }
 
     void Update()
@@ -92,6 +153,13 @@ public class LevelManager : MonoBehaviour
         {
             timer += Time.deltaTime;
             UpdateTimerUI();
+        }
+
+        if (!IsGameOver)
+        {
+            bool allPelletsCleared = GameObject.FindGameObjectsWithTag("Pellet").Length == 0 &&
+                                     GameObject.FindGameObjectsWithTag("PowerPellet").Length == 0;
+            CheckForGameOverCondition(allPelletsCleared);
         }
     }
 
@@ -186,20 +254,22 @@ public class LevelManager : MonoBehaviour
             PacStudentAnimDriver.I.ClearDeath();
             GameManager.I.SetState(GameState.Playing);
         }
-        PacStudentController.I?.Respawn();
+        Vector3 respawnPos = GetTilemapCenter(pacStudentSpawn);
+        PacStudentController.I?.Respawn(respawnPos);
         timerRunning = true;
     }
 
     public void CheckForGameOverCondition(bool allPelletsCleared)
     {
         if (allPelletsCleared && !IsGameOver)
-            StartCoroutine(GameOverRoutine());
+            StartCoroutine(GameWinRoutine());
     }
 
     IEnumerator GameOverRoutine()
     {
         IsGameOver = true;
         timerRunning = false;
+        FreezeAllCharacters();
         if (PacStudentController.I != null)
             PacStudentController.I.StopMovement();
         if (PacStudentAnimDriver.I != null)
@@ -214,6 +284,29 @@ public class LevelManager : MonoBehaviour
         }
         ShowOverlay("GAME OVER");
         AudioManager.I?.OnGameStateChanged(GameState.LevelCleared);
+        SaveIfBestScore();
+        yield return new WaitForSeconds(6f);
+        SceneManager.LoadScene("StartScene");
+        GameManager.I.SetState(GameState.Boot);
+    }
+
+    IEnumerator GameWinRoutine()
+    {
+        IsGameOver = true;
+        timerRunning = false;
+        FreezeAllCharacters();
+        if (PacStudentController.I != null)
+        {  
+            PacStudentController.I.StopMovement(); 
+            PacStudentController.I.StopAnimation();
+        }
+        if (cherryControllerInstance != null)
+        {
+            Destroy(cherryControllerInstance);
+            cherryControllerInstance = null;
+        }
+        ShowOverlay("GAME OVER, You WIN!");
+        GameManager.I.SetState(GameState.LevelCleared);
         SaveIfBestScore();
         yield return new WaitForSeconds(6f);
         SceneManager.LoadScene("StartScene");
@@ -243,12 +336,21 @@ public class LevelManager : MonoBehaviour
         blurImage.enabled = true;
         overlayText.text = t;
     }
+
     void HideOverlay()
     {
         overlayText.text = "";
         blurImage.enabled = false;
     }
 
+    void FreezeAllCharacters()
+    {
+        if (PacStudentController.I != null)
+            PacStudentController.I.StopMovement();
+
+        foreach (GhostStateManager g in FindObjectsByType<GhostStateManager>(FindObjectsSortMode.None))
+            g.StopAllMovement();
+    }
     void OnDestroy()
     {
         if (cherryControllerInstance != null)

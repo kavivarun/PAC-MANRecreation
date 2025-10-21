@@ -12,36 +12,41 @@ public class GhostStateManager : MonoBehaviour
 
     private GhostVisuals visuals;
     private Coroutine deadRoutine;
+    private Rigidbody2D rb;
+    private bool isFrozen;
+
     public GhostState CurrentState { get; private set; } = GhostState.Normal;
 
     void Awake()
     {
         visuals = GetComponent<GhostVisuals>();
+        rb = GetComponent<Rigidbody2D>();
     }
 
     public void EnterNormal()
     {
+        if (isFrozen) return;
         CurrentState = GhostState.Normal;
         visuals.EnterNormal();
     }
 
     public void EnterScared()
     {
-        if (CurrentState == GhostState.Dead) return;
+        if (isFrozen || CurrentState == GhostState.Dead) return;
         CurrentState = GhostState.Scared;
         visuals.EnterFrightened(true);
     }
 
     public void EnterRecovering()
     {
-        if (CurrentState == GhostState.Dead) return;
+        if (isFrozen || CurrentState == GhostState.Dead) return;
         CurrentState = GhostState.Recovering;
         visuals.EnterRecovering();
     }
 
     public void EnterDead()
     {
-        if (CurrentState == GhostState.Dead) return;
+        if (isFrozen || CurrentState == GhostState.Dead) return;
         CurrentState = GhostState.Dead;
         visuals.EnterDead(true);
         LevelManager.I?.AddScore(ghostKillPoints);
@@ -54,7 +59,6 @@ public class GhostStateManager : MonoBehaviour
     IEnumerator RespawnRoutine()
     {
         yield return new WaitForSeconds(ghostDeadDuration);
-
         if (LevelManager.I != null)
         {
             float remain = LevelManager.I.ScaredTimeRemaining;
@@ -71,7 +75,7 @@ public class GhostStateManager : MonoBehaviour
                 GameManager.I?.SetState(GameState.PowerMode);
             }
             else
-            { 
+            {
                 EnterNormal();
                 GameManager.I?.SetState(GameState.Playing);
             }
@@ -95,8 +99,26 @@ public class GhostStateManager : MonoBehaviour
             transform.position = spawnPoint.position;
     }
 
+    public void StopAllMovement()
+    {
+        isFrozen = true;
+        if (rb != null)
+        {
+            rb.velocity = Vector2.zero;
+            rb.simulated = false;
+        }
+    }
+
+    public void ResumeMovement()
+    {
+        isFrozen = false;
+        if (rb != null)
+            rb.simulated = true;
+    }
+
     void OnTriggerEnter2D(Collider2D other)
     {
+        if (isFrozen) return;
         if (!other.CompareTag("Player")) return;
         if (CurrentState == GhostState.Scared || CurrentState == GhostState.Recovering)
         {
