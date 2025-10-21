@@ -233,7 +233,7 @@ public class LevelManager : MonoBehaviour
 
     public void LoseLife()
     {
-        if (IsGameOver) return;
+        if (IsGameOver || PacStudentController.I.IsDead) return;
         CurrentLives--;
         UpdateLivesUI();
         if (CurrentLives > 0)
@@ -244,9 +244,11 @@ public class LevelManager : MonoBehaviour
 
     IEnumerator RespawnRoutine()
     {
-        timerRunning = false;
+        timerRunning = false;;
         if (PacStudentController.I != null)
             PacStudentController.I.StopMovement();
+        foreach (GhostStateManager g in FindObjectsByType<GhostStateManager>(FindObjectsSortMode.None))
+            g.StopAllMovement();
         if (PacStudentAnimDriver.I != null)
         {
             PacStudentAnimDriver.I.PlayDeath();
@@ -256,6 +258,8 @@ public class LevelManager : MonoBehaviour
         }
         Vector3 respawnPos = GetTilemapCenter(pacStudentSpawn);
         PacStudentController.I?.Respawn(respawnPos);
+        foreach (GhostStateManager g in FindObjectsByType<GhostStateManager>(FindObjectsSortMode.None))
+            g.ResetGhost();
         timerRunning = true;
     }
 

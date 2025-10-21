@@ -25,6 +25,7 @@ public class PacStudentController : MonoBehaviour
     private Vector2Int? lastWallHitDir = null;
     private Vector2Int facingDir = Vector2Int.right;
 
+    public bool IsDead => animDriver != null ? animDriver.IsDead : false;
 
     void Awake()
     {
@@ -47,7 +48,7 @@ public class PacStudentController : MonoBehaviour
     void Update()
     {
         if (animDriver.IsDead || GameManager.I.CurrentState == GameState.LevelCleared) return;
-            ReadInput();
+        ReadInput();
         var level = TilemapLevel.I;
 
         if (!tweener.TweenExists(transform))

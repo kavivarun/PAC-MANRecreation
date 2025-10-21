@@ -182,7 +182,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1441c4eff62adb0478ba3ef7c48761ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  spawnPoint: {fileID: 0}
+  spawnTilemapName: YellowGhostSpawn
+  exitTilemapName: YellowGhostExit
+  startInSpawn: 1
   ghostDeadDuration: 3
   ghostKillPoints: 300
 --- !u!1 &9096406978776520659
