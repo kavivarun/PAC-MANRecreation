@@ -7,7 +7,7 @@ public class GhostStateManager : MonoBehaviour
     public enum GhostState { Normal, Scared, Recovering, Dead }
 
     [SerializeField] private Transform spawnPoint;
-    [SerializeField] private float respawnDelay = 3f;
+    [SerializeField] private float ghostDeadDuration = 3f;
     [SerializeField] private int ghostKillPoints = 300;
 
     private GhostVisuals visuals;
@@ -36,18 +36,16 @@ public class GhostStateManager : MonoBehaviour
     {
         if (CurrentState == GhostState.Dead) return;
         CurrentState = GhostState.Recovering;
-        visuals.EnterFrightened(false);
+        visuals.EnterRecovering();
     }
 
     public void EnterDead()
     {
         if (CurrentState == GhostState.Dead) return;
-
         CurrentState = GhostState.Dead;
         visuals.EnterDead(true);
         LevelManager.I?.AddScore(ghostKillPoints);
-        GameManager.I?.SetState(GameState.Dying);
-
+        GameManager.I?.SetState(GameState.AlienDead);
         if (deadRoutine != null)
             StopCoroutine(deadRoutine);
         deadRoutine = StartCoroutine(RespawnRoutine());
@@ -55,16 +53,36 @@ public class GhostStateManager : MonoBehaviour
 
     IEnumerator RespawnRoutine()
     {
-        yield return new WaitForSeconds(respawnDelay);
+        yield return new WaitForSeconds(ghostDeadDuration);
 
-        if (LevelManager.I != null && LevelManager.I.IsGhostsScared)
-            EnterScared();
+        if (LevelManager.I != null)
+        {
+            float remain = LevelManager.I.ScaredTimeRemaining;
+            if (remain > 3f)
+            {
+                CurrentState = GhostState.Scared;
+                visuals.EnterFrightened(true);
+                GameManager.I?.SetState(GameState.PowerMode);
+            }
+            else if (remain > 0f)
+            {
+                CurrentState = GhostState.Recovering;
+                visuals.EnterFrightened(true);
+                GameManager.I?.SetState(GameState.PowerMode);
+            }
+            else
+            { 
+                EnterNormal();
+                GameManager.I?.SetState(GameState.Playing);
+            }
+        }
         else
+        {
             EnterNormal();
+        }
 
         if (spawnPoint)
             transform.position = spawnPoint.position;
-
         deadRoutine = null;
     }
 
@@ -80,7 +98,6 @@ public class GhostStateManager : MonoBehaviour
     void OnTriggerEnter2D(Collider2D other)
     {
         if (!other.CompareTag("Player")) return;
-
         if (CurrentState == GhostState.Scared || CurrentState == GhostState.Recovering)
         {
             EnterDead();

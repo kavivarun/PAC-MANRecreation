@@ -49,7 +49,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 37bf121452835c141ae34d34f5699089, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  body: {fileID: 0}
+  body: {fileID: 2535261113220965477}
   eyes: {fileID: 2952463270860881456}
   eyesDir:
   - {fileID: -3705459722955959948, guid: 43b70e62e3f74a345bd8d227cbdbd0dd, type: 3}
@@ -183,7 +183,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   spawnPoint: {fileID: 0}
-  respawnDelay: 3
+  ghostDeadDuration: 3
   ghostKillPoints: 300
 --- !u!1 &9096406978776520659
 GameObject:

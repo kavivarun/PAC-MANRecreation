@@ -4850,7 +4850,7 @@ GameObject:
   - component: {fileID: 4026569632648152418}
   m_Layer: 6
   m_Name: PacStudent
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

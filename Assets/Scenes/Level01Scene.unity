@@ -1303,34 +1303,15 @@ PrefabInstance:
       propertyPath: m_Name
       value: RedGhost
       objectReference: {fileID: 0}
+    - target: {fileID: 7803947579751645591, guid: 02acec524ce53cf478e11f9acd61e0b9, type: 3}
+      propertyPath: spawnPoint
+      value: 
+      objectReference: {fileID: 1490829612}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 3649424176375972369, guid: 02acec524ce53cf478e11f9acd61e0b9, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 619211474}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 02acec524ce53cf478e11f9acd61e0b9, type: 3}
---- !u!1 &619211473 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 3649424176375972369, guid: 02acec524ce53cf478e11f9acd61e0b9, type: 3}
-  m_PrefabInstance: {fileID: 619211472}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &619211474
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 619211473}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1441c4eff62adb0478ba3ef7c48761ff, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  spawnPoint: {fileID: 1490829612}
-  respawnDelay: 3
-  ghostKillPoints: 300
 --- !u!1839735485 &626725277 stripped
 Tilemap:
   m_CorrespondingSourceObject: {fileID: 1244646916302446738, guid: 61438769099f33045bc0a9fe79438911, type: 3}
@@ -1940,6 +1921,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2345728716595139882, guid: ee02a6de81fae6e499f1efd92fb0eb05, type: 3}
+      propertyPath: spawnPoint
+      value: 
+      objectReference: {fileID: 1490829612}
     - target: {fileID: 3125573872358764460, guid: ee02a6de81fae6e499f1efd92fb0eb05, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0.7999375
@@ -1987,16 +1972,8 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 3649424176375972369, guid: ee02a6de81fae6e499f1efd92fb0eb05, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1561203885}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ee02a6de81fae6e499f1efd92fb0eb05, type: 3}
---- !u!1 &884366614 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 3649424176375972369, guid: ee02a6de81fae6e499f1efd92fb0eb05, type: 3}
-  m_PrefabInstance: {fileID: 884366613}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &893961678
 GameObject:
   m_ObjectHideFlags: 0
@@ -3064,10 +3041,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: PacStudent
       objectReference: {fileID: 0}
-    - target: {fileID: 8027504428889851781, guid: fa8d7a7ad02394f4394b03c944108c0c, type: 3}
-      propertyPath: m_TagString
-      value: Player
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -3185,54 +3158,20 @@ PrefabInstance:
       propertyPath: m_Name
       value: PurpleGhost
       objectReference: {fileID: 0}
+    - target: {fileID: 7587589707118341801, guid: 381e898f35229fe469fff35eed22594c, type: 3}
+      propertyPath: spawnPoint
+      value: 
+      objectReference: {fileID: 1490829612}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 3649424176375972369, guid: 381e898f35229fe469fff35eed22594c, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1540797502}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 381e898f35229fe469fff35eed22594c, type: 3}
---- !u!1 &1540797501 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 3649424176375972369, guid: 381e898f35229fe469fff35eed22594c, type: 3}
-  m_PrefabInstance: {fileID: 1540797500}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &1540797502
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1540797501}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1441c4eff62adb0478ba3ef7c48761ff, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  spawnPoint: {fileID: 1490829612}
-  respawnDelay: 3
-  ghostKillPoints: 300
 --- !u!4 &1561203884 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3125573872358764460, guid: ee02a6de81fae6e499f1efd92fb0eb05, type: 3}
   m_PrefabInstance: {fileID: 884366613}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &1561203885
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 884366614}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1441c4eff62adb0478ba3ef7c48761ff, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  spawnPoint: {fileID: 1490829612}
-  respawnDelay: 3
-  ghostKillPoints: 300
 --- !u!1 &1582525348
 GameObject:
   m_ObjectHideFlags: 0
