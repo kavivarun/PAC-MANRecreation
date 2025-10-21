@@ -9,6 +9,7 @@ public class PacStudentAnimDriver : MonoBehaviour
     [SerializeField] private bool moveAlways = true;
     [SerializeField] private string deathStateName = "PacStudentDie";
     [SerializeField] private ParticleSystem dustEffect;
+    [SerializeField] private ParticleSystem deathEffect;
 
     static readonly int P_MoveX = Animator.StringToHash("MoveX");
     static readonly int P_MoveY = Animator.StringToHash("MoveY");
@@ -98,6 +99,12 @@ public class PacStudentAnimDriver : MonoBehaviour
 
     public void PlayDeath()
     {
+        if (deathEffect != null)
+        {
+            var effect = Instantiate(deathEffect, transform.position, Quaternion.identity);
+            effect.Play();
+            Destroy(effect.gameObject, 1f);
+        }
         animator.speed = 1f;
         animator.SetBool(P_IsDead, true);
         if (!string.IsNullOrEmpty(deathStateName)) animator.Play(deathStateName, 0, 0f);
