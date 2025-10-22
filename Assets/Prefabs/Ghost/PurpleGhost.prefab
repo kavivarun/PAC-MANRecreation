@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 7461323335569740277}
   - component: {fileID: 2535261113220965477}
   - component: {fileID: 7587589707118341801}
+  - component: {fileID: -541120645871067721}
   m_Layer: 0
   m_Name: PurpleGhost
   m_TagString: Untagged
@@ -187,6 +188,20 @@ MonoBehaviour:
   startInSpawn: 1
   ghostDeadDuration: 3
   ghostKillPoints: 300
+--- !u!114 &-541120645871067721
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3649424176375972369}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 64cbe016033b56d4e8aa0c6be05e4e95, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  movementStyle: 1
+  tickDelay: 0.01
 --- !u!1 &9096406978776520659
 GameObject:
   m_ObjectHideFlags: 0

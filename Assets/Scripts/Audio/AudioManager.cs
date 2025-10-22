@@ -52,6 +52,29 @@ public class AudioManager : MonoBehaviour
     private readonly Dictionary<SfxEvent, float> lastPlay = new();
     private AudioSource[] sfxPool;
     private int sfxIndex;
+
+    private int deadGhostCount = 0;
+    private bool audioLocked = false;
+
+    public void LockToDeadAudio()
+    {
+        deadGhostCount++;
+        if (!audioLocked)
+        {
+            audioLocked = true;
+        }
+    }
+
+    public void UnlockDeadAudio()
+    {
+        deadGhostCount = Mathf.Max(0, deadGhostCount - 1);
+        if (deadGhostCount == 0)
+        {
+            audioLocked = false;
+        }
+    }
+
+    public bool IsAudioLocked => audioLocked;
     void Start()
     {
         OnGameStateChanged(GameState.Boot);
@@ -98,8 +121,14 @@ public class AudioManager : MonoBehaviour
 
     public void OnGameStateChanged(GameState next)
     {
+
+        if (audioLocked)
+            return;
+
         if (currentState == next) return;
         currentState = next;
+
+
 
         AudioClip clip = null;
         AudioMixerSnapshot snap = normalSnapshot;

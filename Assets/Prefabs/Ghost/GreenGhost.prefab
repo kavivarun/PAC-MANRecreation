@@ -200,7 +200,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 64cbe016033b56d4e8aa0c6be05e4e95, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  movementStyle: 1
+  movementStyle: 0
   tickDelay: 0.01
 --- !u!1 &9096406978776520659
 GameObject:

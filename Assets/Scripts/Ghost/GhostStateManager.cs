@@ -96,12 +96,12 @@ public class GhostStateManager : MonoBehaviour
                     if (navMode == NavMode.ExitFromSpawnInitial)
                     {
                         navMode = NavMode.None;
-                        EnterNormal();
+                        EnterNormalNoState();
                     }
                     else
                     {
-                        navMode = NavMode.None;
-                        NotifyExitedSpawn();
+                        //navMode = NavMode.None;
+                        //NotifyExitedSpawn();
                     }
                 }
             }
@@ -114,6 +114,13 @@ public class GhostStateManager : MonoBehaviour
         CurrentState = GhostState.Normal;
         visuals.EnterNormal();
         GameManager.I?.SetState(GameState.Playing);
+    }
+
+    public void EnterNormalNoState()
+    {
+        if (isFrozen) return;
+        CurrentState = GhostState.Normal;
+        visuals.EnterNormal();
     }
 
     public void EnterScared()
@@ -150,13 +157,35 @@ public class GhostStateManager : MonoBehaviour
     {
         if (spawnTilemap != null)
         {
+            GameState gameState;
             Vector2Int spawnCell = ResolveNearest(spawnTilemap, level.WorldToGrid(transform.position));
             Vector3 target = level.GridToWorld(spawnCell);
             float dur = ghostDeadDuration;
             tweener.CancelTween(transform);
             tweener.AddTween(transform, transform.position, target, dur);
+            yield return tweener.WaitUntilTweenDone(transform);
+            AudioManager.I?.UnlockDeadAudio();
+            float remain = LevelManager.I != null ? LevelManager.I.ScaredTimeRemaining : 0f;
+            if (remain > 3f)
+            {
+                CurrentState = GhostState.Scared;
+                visuals.EnterFrightened(true);
+                gameState = GameState.PowerMode;
+            }
+            else if (remain > 0f)
+            {
+                CurrentState = GhostState.Recovering;
+                visuals.EnterRecovering();
+                gameState = GameState.PowerMode;
+            }
+            else
+            {
+                CurrentState = GhostState.Normal;
+                visuals.EnterNormal();
+                gameState = GameState.Playing;
+            }
+            GameManager.I.SetState(gameState);
             navMode = NavMode.ReturnToSpawn;
-            yield return new WaitForSeconds(ghostDeadDuration);
         }
         else
         {
@@ -185,7 +214,7 @@ public class GhostStateManager : MonoBehaviour
         }
         else
         {
-            EnterNormal();
+            EnterNormalNoState();
         }
         postSpawnResumePending = false;
     }

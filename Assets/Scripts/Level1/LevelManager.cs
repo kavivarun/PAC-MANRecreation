@@ -225,7 +225,7 @@ public class LevelManager : MonoBehaviour
         ghostTimer?.gameObject.SetActive(false);
         foreach (GhostStateManager g in FindObjectsByType<GhostStateManager>(FindObjectsSortMode.None))
             if (g.CurrentState != GhostStateManager.GhostState.Dead)
-                g.EnterNormal();
+                g.EnterNormalNoState();
         if (GameManager.I.CurrentState != GameState.AlienDead)
             GameManager.I.SetState(GameState.Playing);
         scaredTimerRoutine = null;

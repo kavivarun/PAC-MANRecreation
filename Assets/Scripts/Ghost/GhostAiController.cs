@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -39,15 +40,11 @@ public class GhostAiController : MonoBehaviour
     void Update()
     {
         if (gsm != null && gsm.IsFrozen) return;
-        
         if (gsm.MovementOverrideActive) return;
         if (Time.time < nextTick) return;
         nextTick = Time.time + tickDelay;
-
         if (!tweener.TweenExists(transform)) gridPos = level.WorldToGrid(transform.position);
-
         if (gsm.CurrentState == GhostStateManager.GhostState.Dead) return;
-
         if (tweener.TweenExists(transform)) return;
 
         var style = EffectiveStyle();
@@ -114,9 +111,9 @@ public class GhostAiController : MonoBehaviour
         var next = gridPos + dir;
         if (!IsWalkable(next)) return;
         float speed = GetSpeed();
-        float dur = Mathf.Max(0.0001f, TilemapLevel.I.cellSize / speed);
-        Vector3 a = transform.position;
+        Vector3 a = level.GridToWorld(gridPos);
         Vector3 b = level.GridToWorld(next);
+        float dur = (b - a).magnitude / (speed * TilemapLevel.I.cellSize);;
         if (tweener.AddTween(transform, a, b, dur))
         {
             gridPos = next;
@@ -150,6 +147,12 @@ public class GhostAiController : MonoBehaviour
             var d = dirs[i];
             var n = c + d;
             if (IsWalkable(n)) list.Add(d);
+        }
+        if (list.Count > 1)
+        {
+            var back = -lastDir;
+            for (int i = list.Count - 1; i >= 0; i--)
+                if (list[i] == back) list.RemoveAt(i);
         }
         return list;
     }

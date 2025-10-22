@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -39,6 +40,11 @@ public class Tweener : MonoBehaviour
                 activeTweens.RemoveAt(i);
             }
         }
+    }
+    public IEnumerator WaitUntilTweenDone(Transform target)
+    {
+        while (TweenExists(target))
+            yield return null;
     }
 
     void Update()
