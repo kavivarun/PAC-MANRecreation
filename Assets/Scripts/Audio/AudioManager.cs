@@ -54,31 +54,95 @@ public class AudioManager : MonoBehaviour
     private int sfxIndex;
 
     private int deadGhostCount = 0;
-    private bool audioLocked = false;
+    private GameState stateBeforeDeadGhosts = GameState.Playing;
+    private bool lockAudioSwap = false;
 
-    public void LockToDeadAudio()
-    {
-        deadGhostCount++;
-        if (!audioLocked)
-        {
-            audioLocked = true;
-        }
-    }
-
-    public void UnlockDeadAudio()
-    {
-        deadGhostCount = Mathf.Max(0, deadGhostCount - 1);
-        if (deadGhostCount == 0)
-        {
-            audioLocked = false;
-        }
-    }
-
-    public bool IsAudioLocked => audioLocked;
     void Start()
     {
         OnGameStateChanged(GameState.Boot);
     }
+
+    void Update()
+    {
+        int currentDeadCount = CountDeadGhosts();
+        if (currentDeadCount != deadGhostCount)
+        {
+
+            deadGhostCount = currentDeadCount;
+
+            if (deadGhostCount > 0)
+            {
+                lockAudioSwap = true;
+                if (currentState != GameState.AlienDead)
+                {
+                    stateBeforeDeadGhosts = currentState;
+                }
+                if (currentState != GameState.AlienDead)
+                {
+                    PlayDeadGhostAudio();
+                }
+            }
+            else
+            {
+                lockAudioSwap = false;
+                stateBeforeDeadGhosts = currentState;
+                ReturnFromDeadGhostAudio();
+            }
+        }
+
+    }
+
+    private int CountDeadGhosts()
+    {
+        var ghostManagers = Object.FindObjectsByType<GhostStateManager>(FindObjectsSortMode.None);
+        int count = 0;
+        
+        foreach (var ghost in ghostManagers)
+        {
+            if (ghost.CurrentState == GhostStateManager.GhostState.Dead)
+            {
+                count++;
+            }
+        }
+        
+        return count;
+    }
+
+    private void PlayDeadGhostAudio()
+    {
+        currentState = GameState.AlienDead;
+        CrossfadeTo(killLoop, defaultFade);
+    }
+
+    private void ReturnFromDeadGhostAudio()
+    {
+        GameState targetState = DetermineAppropriateState();
+        
+        if (targetState != currentState)
+        {
+            OnGameStateChanged(targetState);
+        }
+    }
+
+    private GameState DetermineAppropriateState()
+    {
+        var ghostManagers = Object.FindObjectsByType<GhostStateManager>(FindObjectsSortMode.None);
+        bool hasScaredGhosts = false;
+        
+        foreach (var ghost in ghostManagers)
+        {
+            if (ghost.CurrentState == GhostStateManager.GhostState.Scared || 
+                ghost.CurrentState == GhostStateManager.GhostState.Recovering)
+            {
+                hasScaredGhosts = true;
+                break;
+            }
+        }
+        
+        // Return to PowerMode if there are scared ghosts, otherwise return to Playing
+        return hasScaredGhosts ? GameState.PowerMode : GameState.Playing;
+    }
+
     void Awake()
     {
         if (I != null) { Destroy(gameObject); return; }
@@ -122,8 +186,6 @@ public class AudioManager : MonoBehaviour
     public void OnGameStateChanged(GameState next)
     {
 
-        if (audioLocked)
-            return;
 
         if (currentState == next) return;
         currentState = next;
@@ -144,8 +206,12 @@ public class AudioManager : MonoBehaviour
                     StartCoroutine(CoAfterIntro(introLoop.length));
                 break;
             case GameState.Playing:
+                if (lockAudioSwap)
+                    return;
                 clip = normalLoop; break;
             case GameState.PowerMode:
+                if (lockAudioSwap)
+                    return;
                 clip = powerLoop; snap = frightenedSnapshot; break;
             case GameState.AlienDead:
                 clip = killLoop; break;

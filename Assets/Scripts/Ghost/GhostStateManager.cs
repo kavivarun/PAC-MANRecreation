@@ -34,7 +34,6 @@ public class GhostStateManager : MonoBehaviour
     Coroutine deadRoutine;
     bool isFrozen;
     bool postSpawnResumePending;
-    GhostState queuedResumeState = GhostState.Normal;
 
     public GhostState CurrentState { get; private set; } = GhostState.Normal;
     public bool MovementOverrideActive => navMode != NavMode.None || tweener.TweenExists(transform);
@@ -100,8 +99,8 @@ public class GhostStateManager : MonoBehaviour
                     }
                     else
                     {
-                        //navMode = NavMode.None;
-                        //NotifyExitedSpawn();
+                        navMode = NavMode.None;
+                        NotifyExitedSpawn();
                     }
                 }
             }
@@ -145,7 +144,6 @@ public class GhostStateManager : MonoBehaviour
         CurrentState = GhostState.Dead;
         visuals.EnterDead(true);
         LevelManager.I?.AddScore(ghostKillPoints);
-        GameManager.I?.SetState(GameState.AlienDead);
         if (deadRoutine != null) StopCoroutine(deadRoutine);
         navMode = NavMode.None;
         navQueue.Clear();
@@ -164,7 +162,6 @@ public class GhostStateManager : MonoBehaviour
             tweener.CancelTween(transform);
             tweener.AddTween(transform, transform.position, target, dur);
             yield return tweener.WaitUntilTweenDone(transform);
-            AudioManager.I?.UnlockDeadAudio();
             float remain = LevelManager.I != null ? LevelManager.I.ScaredTimeRemaining : 0f;
             if (remain > 3f)
             {
@@ -228,7 +225,6 @@ public class GhostStateManager : MonoBehaviour
         navMode = NavMode.None;
         isFrozen = false;
         postSpawnResumePending = false;
-        queuedResumeState = GhostState.Normal;
 
         if (spawnTilemap != null)
         {

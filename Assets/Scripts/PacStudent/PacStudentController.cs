@@ -118,8 +118,8 @@ public class PacStudentController : MonoBehaviour
                 AudioManager.I?.PlaySfx(SfxEvent.WallHit, gameObject);
 
                 Vector3 wobbleStart = transform.position;
-                Vector3 wobbleEnd = wobbleStart + new Vector3(dir.x * 0.2f, dir.y * 0.2f, 0f);
-                float wobbleTime = 0.05f;
+                Vector3 wobbleEnd = wobbleStart + new Vector3(dir.x * 0.5f, dir.y * 0.5f, 0f);
+                float wobbleTime = 0.1f;
                 if (!tweener.TweenExists(transform))
                 {
                     tweener.AddTween(transform, wobbleStart, wobbleEnd, wobbleTime);
