@@ -2390,6 +2390,11 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1157842712}
   m_CullTransparentMesh: 1
+--- !u!1839735485 &1227467532 stripped
+Tilemap:
+  m_CorrespondingSourceObject: {fileID: 2191132261898894874, guid: 61438769099f33045bc0a9fe79438911, type: 3}
+  m_PrefabInstance: {fileID: 1979599061}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1236235814
 GameObject:
   m_ObjectHideFlags: 0
@@ -2942,6 +2947,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Map
       objectReference: {fileID: 0}
+    - target: {fileID: 8830862534670942678, guid: 61438769099f33045bc0a9fe79438911, type: 3}
+      propertyPath: outsidePerimeter
+      value: 
+      objectReference: {fileID: 1227467532}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

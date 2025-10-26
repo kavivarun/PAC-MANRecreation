@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
-
 public class TilemapLevel : MonoBehaviour
 {
     public static TilemapLevel I { get; private set; }
@@ -15,6 +14,7 @@ public class TilemapLevel : MonoBehaviour
     public Tilemap teleporters;
     public Tilemap ghostHome;
     public Tilemap ghostGate;
+    public Tilemap outsidePerimeter;
 
     [Header("Prefabs")]
     public GameObject pelletPrefab;
@@ -31,6 +31,8 @@ public class TilemapLevel : MonoBehaviour
     private TileFlags[,] map;
     private BoundsInt bounds;
 
+    public BoundsInt Bounds => bounds;
+
     void Awake()
     {
         if (I != null) { Destroy(gameObject); return; }
@@ -40,8 +42,8 @@ public class TilemapLevel : MonoBehaviour
 
     private void Build()
     {
-        var tms = new List<Tilemap> { walls, floor, pellets, powerPellets, teleporters, ghostHome, ghostGate };
-        bounds = tms[0].cellBounds;
+        var tms = new List<Tilemap> { walls, floor, pellets, powerPellets, teleporters, ghostHome, ghostGate, outsidePerimeter };
+        bounds = tms[0] != null ? tms[0].cellBounds : new BoundsInt(0, 0, 0, 1, 1, 1);
         foreach (var tm in tms)
         {
             if (tm == null) continue;
@@ -144,5 +146,12 @@ public class TilemapLevel : MonoBehaviour
             if (from == teleporterB.Value) { dest = teleporterA.Value; return true; }
         }
         return false;
+    }
+
+    public bool IsOutsidePerimeter(Vector2Int c)
+    {
+        if (!InBounds(c)) return false;
+        if (outsidePerimeter == null) return false;
+        return outsidePerimeter.HasTile(new Vector3Int(c.x, c.y, 0));
     }
 }

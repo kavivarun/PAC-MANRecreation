@@ -86,7 +86,7 @@ public class GhostVisuals : MonoBehaviour
         bool isRecovering = state == VisualState.Recovering;
 
         animator.SetBool(P_IsNormal, isNormal);
-        animator.SetBool(P_IsFrightened, isFrightened);
+        animator.SetBool(P_IsFrightened, isFrightened || isRecovering);
         animator.SetBool(P_IsDead, isDead);
 
         if (eyes) eyes.enabled = isNormal;
