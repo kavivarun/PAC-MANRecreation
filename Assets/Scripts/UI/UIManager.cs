@@ -21,13 +21,13 @@ public class UIManager : MonoBehaviour
 
     public void LoadLevel2()
     {
-        SceneManager.LoadScene("LevelGeneratorScene");
+        SceneManager.LoadScene("Level02Scene");
         GameManager.I.SetState(GameState.Intro);
     }
 
     public void LoadUpgrades()
     {
-        SceneManager.LoadScene("UpgradesScene");
+        SceneManager.LoadScene("UpgradeScene");
     }
 
     public void LoadMainMenu()
