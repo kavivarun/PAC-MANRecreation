@@ -117,11 +117,7 @@ public class AudioManager : MonoBehaviour
     private void ReturnFromDeadGhostAudio()
     {
         GameState targetState = DetermineAppropriateState();
-        
-        if (targetState != currentState)
-        {
-            OnGameStateChanged(targetState);
-        }
+        OnGameStateChanged(targetState, true);
     }
 
     private GameState DetermineAppropriateState()
@@ -183,11 +179,11 @@ public class AudioManager : MonoBehaviour
         return groups != null && groups.Length > 0 ? groups[0] : null;
     }
 
-    public void OnGameStateChanged(GameState next)
+    public void OnGameStateChanged(GameState next, bool force = false)
     {
 
 
-        if (currentState == next) return;
+        if (currentState == next && !force) return;
         currentState = next;
 
 
@@ -206,11 +202,11 @@ public class AudioManager : MonoBehaviour
                     StartCoroutine(CoAfterIntro(introLoop.length));
                 break;
             case GameState.Playing:
-                if (lockAudioSwap)
+                if (lockAudioSwap && !force)
                     return;
                 clip = normalLoop; break;
             case GameState.PowerMode:
-                if (lockAudioSwap)
+                if (lockAudioSwap && !force)
                     return;
                 clip = powerLoop; snap = frightenedSnapshot; break;
             case GameState.AlienDead:
