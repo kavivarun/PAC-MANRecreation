@@ -45,7 +45,7 @@ public class GhostAiControllerL2 : MonoBehaviour
         onPerimeter = level.IsOutsidePerimeter(gridPos);
         UpdateVisualDir(lastDir);
         Array movementStyles = Enum.GetValues(typeof(MovementStyle));
-        movementStyle = (MovementStyle)movementStyles.GetValue(UnityEngine.Random.Range(4, movementStyles.Length));
+        movementStyle = (MovementStyle)movementStyles.GetValue(UnityEngine.Random.Range(0, movementStyles.Length));
         
         lastTeleportTime = Time.time;
         lastSpeedBoostTime = Time.time;
