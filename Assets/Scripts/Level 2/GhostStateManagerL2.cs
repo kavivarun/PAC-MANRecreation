@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -25,7 +26,7 @@ public class GhostStateManagerL2 : MonoBehaviour
     Tilemap exitTilemap;
     private int maxGhostLife;
 
-    enum NavMode { None, ExitFromSpawnInitial}
+    enum NavMode { None, ExitFromSpawnInitial }
     NavMode navMode = NavMode.None;
 
     Queue<Vector2Int> navQueue = new Queue<Vector2Int>();
@@ -41,13 +42,20 @@ public class GhostStateManagerL2 : MonoBehaviour
     public bool PostSpawnResumePending => postSpawnResumePending;
     public bool IsFrozen => isFrozen;
 
+    public void SetGhostLife(int newLife)
+    {
+        ghostLife = newLife;
+        maxGhostLife = newLife;
+   UpdateCanvas();
+    }
+
     void Awake()
     {
         visuals = GetComponent<GhostVisuals>();
         tweener = FindFirstObjectByType<Tweener>();
         level = TilemapLevel2.I;
         string[] ghostNames = { "GreenGhost", "PinkGhost", "RedGhost", "YellowGhost" };
-        string selectedGhost = ghostNames[Random.Range(0, ghostNames.Length)];
+        string selectedGhost = ghostNames[UnityEngine.Random.Range(0, ghostNames.Length)];
         spawnTilemapName = $"{selectedGhost}Spawn";
         exitTilemapName = $"{selectedGhost}Exit";
         maxGhostLife = ghostLife;
@@ -61,20 +69,25 @@ public class GhostStateManagerL2 : MonoBehaviour
                 if (!string.IsNullOrEmpty(exitTilemapName) && tm.name == exitTilemapName) exitTilemap = tm;
             }
         }
+        transform.position = spawnTilemap != null ? level.GridToWorld(ResolveAny(spawnTilemap)) : transform.position;
     }
 
     void Start()
     {
         gridPos = level.WorldToGrid(transform.position);
-        if (startInSpawn && exitTilemap != null)
-        {
-            CurrentState = GhostState2.Spawn;
-            BeginExitFromSpawnInitial();
+    
+  // Ensure canvas is updated after any potential life changes from Level2Manager
+       UpdateCanvas();
+      
+   if (startInSpawn && exitTilemap != null)
+  {
+     CurrentState = GhostState2.Spawn;
+     BeginExitFromSpawnInitial();
         }
-        else
-        {
-            EnterNormal();
-        }
+   else
+     {
+   EnterNormalNoState();
+  }
     }
 
     void Update()
@@ -95,8 +108,14 @@ public class GhostStateManagerL2 : MonoBehaviour
                 else
                 {
                     navMode = NavMode.None;
-                    EnterNormalNoState();
+                    CurrentState = GhostState2.Normal;
+                    visuals.EnterNormal();
 
+                    var aiController = GetComponent<GhostAiControllerL2>();
+                    if (aiController != null)
+                    {
+                        aiController.ResetMovementForNewState();
+                    }
                 }
             }
         }
@@ -115,6 +134,12 @@ public class GhostStateManagerL2 : MonoBehaviour
         if (isFrozen) return;
         CurrentState = GhostState2.Normal;
         visuals.EnterNormal();
+
+        var aiController = GetComponent<GhostAiControllerL2>();
+        if (aiController != null)
+        {
+            aiController.ResetMovementForNewState();
+        }
     }
 
 
@@ -212,7 +237,7 @@ public class GhostStateManagerL2 : MonoBehaviour
         Vector3 a = transform.position;
         Vector3 b = level.GridToWorld(next);
         float speed = GetSpeedForState(CurrentState);
-        float dur = Mathf.Max(0.0001f, TilemapLevel.I.cellSize / speed);
+        float dur = Mathf.Max(0.0001f, TilemapLevel2.I.cellSize / speed);
         if (tweener.AddTween(transform, a, b, dur))
         {
             gridPos = next;
@@ -228,7 +253,7 @@ public class GhostStateManagerL2 : MonoBehaviour
 
     float GetSpeedForState(GhostState2 s)
     {
-        float pac = PacStudentController.I ? PacStudentController.I.moveSpeed : 6f;
+        float pac = PacStudentControllerL2.I ? PacStudentControllerL2.I.moveSpeed : 6f;
         float normal = 0.9f * pac;
         if (s == GhostState2.Normal) return normal;
         return normal;
@@ -314,7 +339,6 @@ public class GhostStateManagerL2 : MonoBehaviour
         {
             return;
         }
-
         canvasText.text = $"{ghostLife}/{maxGhostLife}";
     }
 
@@ -327,30 +351,47 @@ public class GhostStateManagerL2 : MonoBehaviour
         else idx = 3;
         visuals.SetDirection(idx);
     }
-    void OnTriggerEnter2D(Collider2D other) 
-    { 
+    void OnDestroy()
+    {
+        Level2Manager.I?.OnGhostDestroyed(this.gameObject);
+    }
+
+    void OnTriggerEnter2D(Collider2D other)
+    {
         if (isFrozen) return;
-         if (!other.CompareTag("Player")) 
-        { 
-            Level2Manager.I?.LoseLife();
-        }
-        else if (other.CompareTag("Bullet"))
+        if (other.CompareTag("Bullet"))
         {
-            ghostLife--;
+            AudioManager.I?.PlaySfx(SfxEvent.Hit, gameObject);
+            ghostLife -= (1 + (int)PlayerPrefs.GetFloat("Upgrade_BD_Value",0)) ;
             if (ghostLife <= 0)
             {
-                Destroy(this.gameObject);
+                EnterDead();
+                StartCoroutine(DestroyAfterDelay(0.2f));
             }
             else
-            {
-                UpdateCanvas();
+         {
+            UpdateCanvas();
             }
-
+        }
+        else if (other.CompareTag("Player") && CurrentState != GhostState2.Dead)
+        {
+   // Check if player is invulnerable before dealing damage
+    if (PacStudentControllerL2.I != null && !PacStudentControllerL2.I.IsInvulnerable)
+            {
+   Level2Manager.I?.LoseLife();
+     }
         }
         else
         {
-            return;
+    return;
         }
+    }
+
+    private IEnumerator DestroyAfterDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        Level2Manager.I?.OnGhostDestroyed(this.gameObject);
+        Destroy(this.gameObject);
     }
 }
 

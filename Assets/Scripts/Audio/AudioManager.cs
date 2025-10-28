@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Audio;
+using UnityEngine.SceneManagement;
 
 
 public class AudioManager : MonoBehaviour
@@ -64,6 +65,9 @@ public class AudioManager : MonoBehaviour
 
     void Update()
     {
+        // Only handle dead ghost audio logic for Level 1 scenes
+        if (IsLevel1Scene())
+        {
         int currentDeadCount = CountDeadGhosts();
         if (currentDeadCount != deadGhostCount)
         {
@@ -89,7 +93,13 @@ public class AudioManager : MonoBehaviour
                 ReturnFromDeadGhostAudio();
             }
         }
+        }
+    }
 
+    private bool IsLevel1Scene()
+    {
+        string sceneName = SceneManager.GetActiveScene().name;
+        return sceneName.Contains("Level01Scene");
     }
 
     private int CountDeadGhosts()

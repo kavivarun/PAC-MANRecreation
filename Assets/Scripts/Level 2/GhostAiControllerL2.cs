@@ -1,12 +1,12 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
 public class GhostAiControllerL2 : MonoBehaviour
 {
-    public enum MovementStyle { AwayFromPac, TowardPac, Random, ClockwisePerimeter }
-
+    public enum MovementStyle { AwayFromPac, TowardPac, Random, ClockwisePerimeter, RandomTeleport, SpeedBoost }
 
     [SerializeField] float tickDelay = 0.01f;
 
@@ -22,6 +22,15 @@ public class GhostAiControllerL2 : MonoBehaviour
     TilemapLevel2 level;
     static readonly Vector2Int[] dirs = { Vector2Int.right, Vector2Int.up, Vector2Int.left, Vector2Int.down };
 
+    float lastTeleportTime;
+    float teleportCooldown = 10f;
+
+    float lastSpeedBoostTime;
+    float speedBoostCooldown = 20f;
+    float speedBoostDuration = 5f;
+    bool isSpeedBoosted;
+    float speedBoostEndTime;
+
     void Awake()
     {
         tweener = FindFirstObjectByType<Tweener>();
@@ -36,13 +45,25 @@ public class GhostAiControllerL2 : MonoBehaviour
         onPerimeter = level.IsOutsidePerimeter(gridPos);
         UpdateVisualDir(lastDir);
         Array movementStyles = Enum.GetValues(typeof(MovementStyle));
-        movementStyle = (MovementStyle)movementStyles.GetValue(UnityEngine.Random.Range(0, movementStyles.Length));
+        movementStyle = (MovementStyle)movementStyles.GetValue(UnityEngine.Random.Range(4, movementStyles.Length));
+        
+        lastTeleportTime = Time.time;
+        lastSpeedBoostTime = Time.time;
     }
 
     void Update()
     {
         if (gsm != null && gsm.IsFrozen) return;
         if (gsm.MovementOverrideActive) return;
+
+        if (movementStyle == MovementStyle.SpeedBoost)
+        {
+            if (isSpeedBoosted && Time.time >= speedBoostEndTime)
+            {
+                isSpeedBoosted = false;
+            }
+        }
+
         if (Time.time < nextTick) return;
         nextTick = Time.time + tickDelay;
 
@@ -74,12 +95,87 @@ public class GhostAiControllerL2 : MonoBehaviour
                 HandleDirectionalMovement(awayFromPac: false);
                 break;
 
+            case MovementStyle.RandomTeleport:
+                HandleRandomTeleportMovement();
+                break;
+
+            case MovementStyle.SpeedBoost:
+                HandleSpeedBoostMovement();
+                break;
+
             default:
                 HandleRandomMovement();
                 break;
         }
     }
 
+    void HandleRandomTeleportMovement()
+    {
+        if (Time.time - lastTeleportTime >= teleportCooldown)
+        {
+            TeleportToRandomLocation();
+            lastTeleportTime = Time.time;
+        }
+        else
+        {
+            HandleRandomMovement();
+        }
+    }
+
+    void HandleSpeedBoostMovement()
+    {
+        if (!isSpeedBoosted && Time.time - lastSpeedBoostTime >= speedBoostCooldown)
+        {
+            isSpeedBoosted = true;
+            speedBoostEndTime = Time.time + speedBoostDuration;
+            lastSpeedBoostTime = Time.time;
+        }
+        
+        HandleRandomMovement();
+    }
+
+    void TeleportToRandomLocation()
+    {
+        List<Vector2Int> validPositions = new List<Vector2Int>();
+        var bounds = level.Bounds;
+        
+        for (int x = bounds.xMin; x < bounds.xMax; x++)
+        {
+            for (int y = bounds.yMin; y < bounds.yMax; y++)
+            {
+                Vector2Int pos = new Vector2Int(x, y);
+                if (IsWalkable(pos))
+                {
+                    validPositions.Add(pos);
+                }
+            }
+        }
+
+        if (validPositions.Count > 0)
+        {
+            Vector3 oldPosition = transform.position;
+            Vector2Int randomPos = validPositions[UnityEngine.Random.Range(0, validPositions.Count)];
+            Vector3 newPosition = level.GridToWorld(randomPos);
+    
+            PlayTeleportEffect(oldPosition);
+            
+            tweener.CancelTween(transform);
+            transform.position = newPosition;
+            gridPos = randomPos;
+            
+            PlayTeleportEffect(newPosition);
+        }
+    }
+
+    void PlayTeleportEffect(Vector3 position)
+    {
+        if (level.TeleportEffectPrefab != null)
+        {
+            AudioManager.I?.PlaySfx(SfxEvent.PowerPickup, gameObject);
+            GameObject effect = Instantiate(level.TeleportEffectPrefab, position, Quaternion.identity);
+            Destroy(effect, 2f);
+        }
+    }
 
     void HandleClockwisePerimeter()
     {
@@ -110,7 +206,7 @@ public class GhostAiControllerL2 : MonoBehaviour
         var candidates = ValidNeighbors(gridPos);
         if (candidates.Count == 0) return;
 
-        Vector3 pacPos = PacStudentController.I ? PacStudentController.I.transform.position : transform.position;
+        Vector3 pacPos = PacStudentControllerL2.I ? PacStudentControllerL2.I.transform.position : transform.position;
         Vector2 pac = new Vector2(pacPos.x, pacPos.y);
         Vector2 curWorld = level.GridToWorld(gridPos);
         float curDist = Vector2.Distance(curWorld, pac);
@@ -153,7 +249,7 @@ public class GhostAiControllerL2 : MonoBehaviour
         float speed = GetSpeed();
         Vector3 a = level.GridToWorld(gridPos);
         Vector3 b = level.GridToWorld(next);
-        float dur = (b - a).magnitude / (speed * TilemapLevel.I.cellSize);
+        float dur = (b - a).magnitude / (speed * TilemapLevel2.I.cellSize);
 
         if (tweener.AddTween(transform, a, b, dur))
         {
@@ -172,8 +268,14 @@ public class GhostAiControllerL2 : MonoBehaviour
 
     float GetSpeed()
     {
-        float pac = PacStudentController.I ? PacStudentController.I.moveSpeed : 6f;
+        float pac = PacStudentControllerL2.I ? PacStudentControllerL2.I.moveSpeed : 6f;
         float normal = 0.9f * pac;
+        
+        if (movementStyle == MovementStyle.SpeedBoost && isSpeedBoosted)
+        {
+            normal *= 2f;
+        }
+        
         if (gsm.CurrentState == GhostStateManagerL2.GhostState2.Normal) return normal;
         if (gsm.CurrentState == GhostStateManagerL2.GhostState2.Dead) return 0.5f * normal;
         return normal;
@@ -334,6 +436,8 @@ public class GhostAiControllerL2 : MonoBehaviour
         nextTick = Time.time + tickDelay;
         gridPos = level.WorldToGrid(transform.position);
         tweener.CancelTween(transform);
+        isSpeedBoosted = false;
+        lastTeleportTime = Time.time;
+        lastSpeedBoostTime = Time.time;
     }
-
 }

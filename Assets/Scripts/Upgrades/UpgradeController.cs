@@ -6,7 +6,7 @@ public class UpgradeController : MonoBehaviour
 {
     [Header("Upgrade Settings")]
     [SerializeField] private string upgradeName;
-    [SerializeField] private int costPerLevel;
+    [SerializeField] private int[] costsPerLevel = { 10, 20, 30, 40 }; 
     [SerializeField] private int maxLevel = 4;
     [SerializeField] private float[] upgradeValues = { 1f, 1.5f, 2f, 3f };
 
@@ -20,19 +20,64 @@ public class UpgradeController : MonoBehaviour
     [Header("PlayerPrefs Keys")]
     [SerializeField] private string playerPrefMoneyKey = "PlayerMoney";
     [SerializeField] private string playerPrefUpgradeKey = "Upgrade_";
+    
+    [Header("Update Settings")]
+    [SerializeField] private bool updateDynamically = true;
+    [SerializeField] private float updateInterval = 0.1f; 
 
     int currentLevel;
     Image[] levelIcons;
+    private float lastKnownMoney = -1f; 
+    private float updateTimer;
 
     void Start()
     {
+        ValidateArrays();
         InitUI();
         LoadUpgrade();
         EnsureMinimumLevel();
         UpdateUI();
+        lastKnownMoney = PlayerPrefs.GetFloat(playerPrefMoneyKey, 0);
 
         if (levelUpButton)
             levelUpButton.onClick.AddListener(OnLevelUpPressed);
+    }
+    
+    void Update()
+    {
+        if (!updateDynamically) return;
+        
+        updateTimer += Time.deltaTime;
+        if (updateTimer >= updateInterval)
+        {
+            updateTimer = 0f;
+            CheckForMoneyChanges();
+        }
+    }
+    
+    void CheckForMoneyChanges()
+    {
+        float currentMoney = PlayerPrefs.GetFloat(playerPrefMoneyKey, 0);
+        if (currentMoney != lastKnownMoney)
+        {
+            lastKnownMoney = currentMoney;
+            UpdateButtonState();
+        }
+    }
+
+    void ValidateArrays()
+    {
+        // Ensure costsPerLevel array has enough elements
+        if (costsPerLevel.Length != maxLevel)
+        {
+            Debug.LogWarning($"{upgradeName}: costsPerLevel array length ({costsPerLevel.Length}) doesn't match maxLevel ({maxLevel}). This may cause issues.");
+        }
+
+        // Ensure upgradeValues array has enough elements
+        if (upgradeValues.Length != maxLevel)
+        {
+            Debug.LogWarning($"{upgradeName}: upgradeValues array length ({upgradeValues.Length}) doesn't match maxLevel ({maxLevel}). This may cause issues.");
+        }
     }
 
     void InitUI()
@@ -89,9 +134,16 @@ public class UpgradeController : MonoBehaviour
         return upgradeValues[Mathf.Clamp(currentLevel - 1, 0, upgradeValues.Length - 1)];
     }
 
+    int GetCostForNextLevel()
+    {
+        if (currentLevel >= maxLevel) return 0; // No cost if already at max level
+        return costsPerLevel[Mathf.Clamp(currentLevel, 0, costsPerLevel.Length - 1)];
+    }
+
     void OnLevelUpPressed()
     {
-        int money = PlayerPrefs.GetInt(playerPrefMoneyKey, 0);
+        float money = PlayerPrefs.GetFloat(playerPrefMoneyKey, 0);
+        int nextLevelCost = GetCostForNextLevel();
 
         if (currentLevel >= maxLevel)
         {
@@ -100,17 +152,17 @@ public class UpgradeController : MonoBehaviour
             return;
         }
 
-        if (money < costPerLevel)
+        if (money < nextLevelCost)
         {
-            Debug.Log($"{upgradeName}: Not enough money");
+            Debug.Log($"{upgradeName}: Not enough money. Need {nextLevelCost}, have {money}");
             UpdateButtonState();
             return;
         }
 
-        money -= costPerLevel;
+        money -= nextLevelCost;
         currentLevel++;
 
-        PlayerPrefs.SetInt(playerPrefMoneyKey, money);
+        PlayerPrefs.SetFloat(playerPrefMoneyKey, money);
         SaveUpgrade();
         UpdateUI();
     }
@@ -125,23 +177,29 @@ public class UpgradeController : MonoBehaviour
 
     void UpdateButtonState()
     {
-        int money = PlayerPrefs.GetInt(playerPrefMoneyKey, 0);
+        float money = PlayerPrefs.GetFloat(playerPrefMoneyKey, 0);
+        int nextLevelCost = GetCostForNextLevel();
 
         if (currentLevel >= maxLevel)
         {
             levelUpButton.interactable = false;
             if (buttonText) buttonText.text = "MAX LEVEL";
         }
-        else if (money < costPerLevel)
+        else if (money < nextLevelCost)
         {
             levelUpButton.interactable = false;
-            if (buttonText) buttonText.text = $"Need ${costPerLevel}";
+            if (buttonText) buttonText.text = $"Need ${nextLevelCost}";
         }
         else
         {
             levelUpButton.interactable = true;
-            if (buttonText) buttonText.text = $"Upgrade (${costPerLevel})";
+            if (buttonText) buttonText.text = $"Upgrade (${nextLevelCost})";
         }
     }
+
+    public void ForceUpdateUI()
+    {
+        CheckForMoneyChanges();
+        UpdateUI();
+    }
 }
-    

@@ -20,6 +20,7 @@ public class TilemapLevel2 : MonoBehaviour
     [Header("Prefabs")]
     public GameObject BulletCollectPrefab;
     public GameObject LifeCollectPrefab;
+    public GameObject TeleportEffectPrefab;
 
     [Header("Grid Settings")]
     public Vector2 gridOrigin = Vector2.zero;

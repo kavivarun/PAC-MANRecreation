@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -10,7 +11,7 @@ public class Level2Manager : MonoBehaviour
     public static Level2Manager I { get; private set; }
 
     [Header("Level Settings")]
-    [SerializeField] private int startingLives = 3;
+    private int startingLives = 3;
 
     [Header("HUD References")]
     [SerializeField] private Image blurImage;
@@ -22,11 +23,9 @@ public class Level2Manager : MonoBehaviour
     [SerializeField] private Transform livesContainer;
     [SerializeField] private GameObject lifeIconPrefab;
 
-
-
     [Header("Spawn Tilemaps")]
     [SerializeField] private Tilemap pacStudentSpawn;
-
+    [SerializeField] private Tilemap ghostSpawnTilemap;
 
     [Header("Character Prefabs")]
     [SerializeField] private GameObject pacStudentPrefab;
@@ -39,13 +38,14 @@ public class Level2Manager : MonoBehaviour
     public int HighScore { get; private set; }
     public int CurrentLives { get; private set; }
     public bool IsGameOver { get; private set; }
-
     public int BulletCount { get; private set; } = 1;
-
     public int RoundNumber { get; private set; } = 1;
 
     private float timer;
     private bool timerRunning;
+    private List<GameObject> activeGhosts = new List<GameObject>();
+    private GameObject[] ghostPrefabs;
+    private bool waveSpawned = false;
 
     void Awake()
     {
@@ -57,9 +57,11 @@ public class Level2Manager : MonoBehaviour
 
         I = this;
         LoadHighScore();
+        startingLives += (int)PlayerPrefs.GetFloat("Upgrade_H_Value", 0);
         CurrentLives = startingLives;
         CurrentScore = 0;
         timer = 0f;
+        ghostPrefabs = new GameObject[] { redGhostPrefab, pinkGhostPrefab, yellowGhostPrefab, greenGhostPrefab };
         UpdateScoreUI();
         UpdateLivesUI();
         UpdateTimerUI();
@@ -71,8 +73,6 @@ public class Level2Manager : MonoBehaviour
 
     IEnumerator StartRoundCountdown()
     {
-        ShowOverlay("3");
-        timerRunning = false;
         string[] sequence = { "3", "2", "1", "GO!" };
         foreach (string s in sequence)
         {
@@ -87,26 +87,37 @@ public class Level2Manager : MonoBehaviour
     void StartRound()
     {
         GameManager.I?.SetState(GameState.Playing);
-
-        if (pacStudentPrefab != null && pacStudentSpawn != null)
+        if (pacStudentPrefab != null && pacStudentSpawn != null && GameObject.FindWithTag("Player") == null)
         {
             Vector3 pos = GetTilemapCenter(pacStudentSpawn);
             Instantiate(pacStudentPrefab, pos, Quaternion.identity);
         }
-
-
         timerRunning = true;
         timer = 0f;
+        SpawnWave();
     }
 
-    private Vector3 GetTilemapCenter(Tilemap tilemap)
+    void SpawnWave()
     {
-        if (tilemap == null) return Vector3.zero;
-        foreach (Vector3Int pos in tilemap.cellBounds.allPositionsWithin)
-            if (tilemap.HasTile(pos))
-                return tilemap.GetCellCenterWorld(pos);
-        return Vector3.zero;
+        activeGhosts.Clear();
+        int count = Mathf.CeilToInt(RoundNumber / 2f);
+        int hp = Mathf.FloorToInt((RoundNumber + 1) / 2f);
+        for (int i = 0; i < count; i++)
+        {
+            GameObject prefab = ghostPrefabs[Random.Range(0, ghostPrefabs.Length)];
+            GameObject ghost = Instantiate(prefab);
+            var gsm = ghost.GetComponent<GhostStateManagerL2>();
+            if (gsm != null)
+            {
+                // Use the new method instead of reflection
+                gsm.SetGhostLife(hp);
+            }
+            activeGhosts.Add(ghost);
+        }
+        waveSpawned = true;
+        UpdateRoundUI();
     }
+
 
     void Update()
     {
@@ -115,6 +126,35 @@ public class Level2Manager : MonoBehaviour
             timer += Time.deltaTime;
             UpdateTimerUI();
         }
+        CheckWaveCompletion();
+    }
+
+    public void OnGhostDestroyed(GameObject ghost)
+    {
+        if (activeGhosts.Contains(ghost))
+        {
+            activeGhosts.Remove(ghost);
+        }
+    }
+
+    void CheckWaveCompletion()
+    {
+        activeGhosts.RemoveAll(ghost => ghost == null);
+
+        if (activeGhosts.Count == 0 && !IsGameOver && waveSpawned)
+        {
+            RoundNumber++;
+            waveSpawned = false;
+            StartCoroutine(StartNextRound());
+        }
+    }
+
+    IEnumerator StartNextRound()
+    {
+        ShowOverlay($"ROUND {RoundNumber}");
+        yield return new WaitForSeconds(.5f);
+        HideOverlay();
+        SpawnWave();
     }
 
     public void AddScore(int amount)
@@ -126,28 +166,23 @@ public class Level2Manager : MonoBehaviour
 
     void UpdateScoreUI()
     {
-        if (scoreText != null)
-            scoreText.text = $"{CurrentScore}";
+        if (scoreText != null) scoreText.text = $"{CurrentScore}";
     }
 
     void UpdateRoundUI()
     {
-        if (roundText != null)
-            roundText.text = $"ROUND : {RoundNumber}";
+        if (roundText != null) roundText.text = $"ROUND : {RoundNumber}";
     }
 
     void UpdateBulletsUI()
     {
-        if (bulletsText != null)
-            bulletsText.text = $"BULLETS : {BulletCount}";
+        if (bulletsText != null) bulletsText.text = $"BULLETS : {BulletCount}";
     }
 
     void UpdateLivesUI()
     {
-        foreach (Transform child in livesContainer)
-            Destroy(child.gameObject);
-        for (int i = 0; i < CurrentLives; i++)
-            Instantiate(lifeIconPrefab, livesContainer);
+        foreach (Transform child in livesContainer) Destroy(child.gameObject);
+        for (int i = 0; i < CurrentLives; i++) Instantiate(lifeIconPrefab, livesContainer);
     }
 
     void UpdateTimerUI()
@@ -159,24 +194,19 @@ public class Level2Manager : MonoBehaviour
         timerText.text = $"TIMER : {minutes:00}:{seconds:00}:{millis:00}";
     }
 
-
     public void LoseLife()
     {
+        AudioManager.I?.PlaySfx(SfxEvent.Hit, gameObject);
         if (IsGameOver || PacStudentControllerL2.I.IsDead) return;
         CurrentLives--;
         UpdateLivesUI();
-        if (CurrentLives > 0)
-            StartCoroutine(InvulnerableRoutine());
-        else
-            StartCoroutine(GameOverRoutine());
+        if (CurrentLives > 0) StartCoroutine(InvulnerableRoutine());
+        else StartCoroutine(GameOverRoutine());
     }
 
     public void GetLife()
     {
-        if (CurrentLives >= startingLives)
-        {
-            AddScore(30);
-        }
+        if (CurrentLives >= startingLives) AddScore(30);
         else
         {
             CurrentLives++;
@@ -186,7 +216,7 @@ public class Level2Manager : MonoBehaviour
 
     public void getBullet()
     {
-        BulletCount++;
+        BulletCount += 1 + (int)PlayerPrefs.GetFloat("Upgrade_BC_Value", 0);
         UpdateBulletsUI();
     }
 
@@ -201,18 +231,22 @@ public class Level2Manager : MonoBehaviour
 
     IEnumerator InvulnerableRoutine()
     {
-        //Todo: make pacstudent blink and invulnerable for 3 seconds
-        yield return null;
+        if (PacStudentControllerL2.I == null) yield break;
+        PacStudentControllerL2.I.SetInvulnerable(true);
+        if (PacStudentAnimDriverL2.I != null)
+            PacStudentAnimDriverL2.I.StartBlinking();
+        yield return new WaitForSeconds(3f);
+        PacStudentControllerL2.I.SetInvulnerable(false);
+        if (PacStudentAnimDriverL2.I != null)
+            PacStudentAnimDriverL2.I.StopBlinking();
     }
-
 
     IEnumerator GameOverRoutine()
     {
         IsGameOver = true;
         timerRunning = false;
         FreezeAllCharacters();
-        if (PacStudentControllerL2.I != null)
-            PacStudentControllerL2.I.StopMovement();
+        if (PacStudentControllerL2.I != null) PacStudentControllerL2.I.StopMovement();
         if (PacStudentAnimDriverL2.I != null)
         {
             PacStudentAnimDriverL2.I.PlayDeath();
@@ -230,11 +264,11 @@ public class Level2Manager : MonoBehaviour
     void SaveIfBestScore()
     {
         float bestTime = PlayerPrefs.GetFloat($"L2BestTime", float.MaxValue);
-        int bestScore = PlayerPrefs.GetInt($"L2HighRound", 0);
-        bool isBetter = CurrentScore > bestScore || (CurrentScore == bestScore && timer < bestTime);
+        int bestRound = PlayerPrefs.GetInt($"L2HighRound", 0);
+        bool isBetter = RoundNumber > bestRound || (RoundNumber == bestRound && timer < bestTime);
         if (isBetter)
         {
-            PlayerPrefs.SetInt($"L2HighRound", CurrentScore);
+            PlayerPrefs.SetInt($"L2HighRound", RoundNumber);
             PlayerPrefs.SetFloat($"L2BestTime", timer);
             PlayerPrefs.Save();
         }
@@ -242,8 +276,8 @@ public class Level2Manager : MonoBehaviour
 
     void SaveMoney()
     {
-        float playerMoney = PlayerPrefs.GetFloat($"PlayerMoney", float.MinValue);
-        playerMoney += CurrentScore/10;
+        float playerMoney = PlayerPrefs.GetFloat($"PlayerMoney", 0);
+        playerMoney += CurrentScore / 10;
         PlayerPrefs.SetFloat($"PlayerMoney", playerMoney);
         PlayerPrefs.Save();
     }
@@ -267,11 +301,16 @@ public class Level2Manager : MonoBehaviour
 
     void FreezeAllCharacters()
     {
-        if (PacStudentControllerL2.I != null)
-            PacStudentControllerL2.I.StopMovement();
-
+        if (PacStudentControllerL2.I != null) PacStudentControllerL2.I.StopMovement();
         foreach (GhostStateManagerL2 g in FindObjectsByType<GhostStateManagerL2>(FindObjectsSortMode.None))
             g.StopAllMovement();
     }
 
+    Vector3 GetTilemapCenter(Tilemap tilemap)
+    {
+        if (tilemap == null) return Vector3.zero;
+        foreach (Vector3Int pos in tilemap.cellBounds.allPositionsWithin)
+            if (tilemap.HasTile(pos)) return tilemap.GetCellCenterWorld(pos);
+        return Vector3.zero;
+    }
 }

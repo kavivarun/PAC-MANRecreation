@@ -19,12 +19,20 @@ public class PacStudentAnimDriverL2 : MonoBehaviour
 
     Vector2 externalFacing = Vector2.right;
 
+    // Blinking system
+    private bool isBlinking = false;
+    private Coroutine blinkingRoutine;
+    private SpriteRenderer spriteRenderer;
+    private Color baseColor;
+
     public bool IsDead => animator != null && animator.GetBool(P_IsDead);
 
     void Awake()
     {
         I = this;
         if (!animator) animator = GetComponent<Animator>();
+        spriteRenderer = GetComponent<SpriteRenderer>();
+        if (spriteRenderer != null) baseColor = spriteRenderer.color;
         if (dustEffect != null) dustEffect.Stop();
     }
 
@@ -128,5 +136,50 @@ public class PacStudentAnimDriverL2 : MonoBehaviour
     void StopDust()
     {
         if (dustEffect != null && dustEffect.isPlaying) dustEffect.Stop();
+    }
+
+    public void StartBlinking()
+    {
+        if (isBlinking) return;
+        isBlinking = true;
+        if (blinkingRoutine != null) StopCoroutine(blinkingRoutine);
+        blinkingRoutine = StartCoroutine(BlinkingRoutine());
+    }
+
+    public void StopBlinking()
+    {
+        isBlinking = false;
+        if (blinkingRoutine != null)
+        {
+            StopCoroutine(blinkingRoutine);
+            blinkingRoutine = null;
+        }
+        if (spriteRenderer != null)
+            spriteRenderer.color = baseColor;
+    }
+
+    private IEnumerator BlinkingRoutine()
+    {
+        float flashSpeed = 10f;
+        float minBrightness = 0.4f;
+        float maxBrightness = 1.2f;
+        float t = 0f;
+
+        while (isBlinking)
+        {
+            t += Time.deltaTime * flashSpeed;
+            float brightness = Mathf.Lerp(minBrightness, maxBrightness, (Mathf.Sin(t) + 1f) * 0.5f);
+
+            if (spriteRenderer != null)
+            {
+                Color c = baseColor * brightness;
+                c.a = baseColor.a;
+                spriteRenderer.color = c;
+            }
+
+            yield return null;
+        }
+        if (spriteRenderer != null)
+            spriteRenderer.color = baseColor;
     }
 }

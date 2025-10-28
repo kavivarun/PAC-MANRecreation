@@ -170,9 +170,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   key: PlayerMoney
-  valueType: 0
+  valueType: 1
   output: {fileID: 83991028}
   defaultValue: 0
+  updateDynamically: 1
+  updateInterval: 0.1
 --- !u!114 &83991028
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -332,7 +334,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: PacStudent Speed
+  m_text: Bullet count
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 12df1c321928f614a829827cb88a5ef2, type: 2}
   m_sharedMaterial: {fileID: -1955526861672304163, guid: 12df1c321928f614a829827cb88a5ef2, type: 2}
@@ -462,14 +464,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe150482bd99986478b21539bbf60e22, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  upgradeName: PacStudentSpeed
-  costPerLevel: 10
+  upgradeName: BS
+  costsPerLevel: 0a0000002800000050000000c8000000
   maxLevel: 4
   upgradeValues:
-  - 6
-  - 7
+  - 0
+  - 2
   - 8
-  - 10
+  - 24
   levelGridParent: {fileID: 1349795866}
   levelUpButton: {fileID: 1602160416}
   unfilledSprite: {fileID: -8357494700477734146, guid: 0bda35a1bbddb574b9c421529888c3c1, type: 3}
@@ -477,6 +479,8 @@ MonoBehaviour:
   buttonText: {fileID: 1430249033}
   playerPrefMoneyKey: PlayerMoney
   playerPrefUpgradeKey: Upgrade_
+  updateDynamically: 1
+  updateInterval: 0.1
 --- !u!1 &270589740
 GameObject:
   m_ObjectHideFlags: 0
@@ -1436,14 +1440,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe150482bd99986478b21539bbf60e22, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  upgradeName: PacStudentSpeed
-  costPerLevel: 10
+  upgradeName: BC
+  costsPerLevel: 0a000000140000005000000096000000
   maxLevel: 4
   upgradeValues:
-  - 6
-  - 7
-  - 8
-  - 10
+  - 0
+  - 1
+  - 3
+  - 5
   levelGridParent: {fileID: 1760863610}
   levelUpButton: {fileID: 339211083}
   unfilledSprite: {fileID: -8357494700477734146, guid: 0bda35a1bbddb574b9c421529888c3c1, type: 3}
@@ -1451,6 +1455,8 @@ MonoBehaviour:
   buttonText: {fileID: 1575656602}
   playerPrefMoneyKey: PlayerMoney
   playerPrefUpgradeKey: Upgrade_
+  updateDynamically: 1
+  updateInterval: 0.1
 --- !u!1 &603539131
 GameObject:
   m_ObjectHideFlags: 0
@@ -2007,14 +2013,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe150482bd99986478b21539bbf60e22, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  upgradeName: PacStudentSpeed
-  costPerLevel: 10
+  upgradeName: BD
+  costsPerLevel: 0a00000032000000640000002c010000
   maxLevel: 4
   upgradeValues:
-  - 6
-  - 7
-  - 8
-  - 10
+  - 0
+  - 1
+  - 3
+  - 5
   levelGridParent: {fileID: 658878968}
   levelUpButton: {fileID: 831177047}
   unfilledSprite: {fileID: -8357494700477734146, guid: 0bda35a1bbddb574b9c421529888c3c1, type: 3}
@@ -2022,6 +2028,8 @@ MonoBehaviour:
   buttonText: {fileID: 382778317}
   playerPrefMoneyKey: PlayerMoney
   playerPrefUpgradeKey: Upgrade_
+  updateDynamically: 1
+  updateInterval: 0.1
 --- !u!1 &919431498
 GameObject:
   m_ObjectHideFlags: 0
@@ -2511,14 +2519,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe150482bd99986478b21539bbf60e22, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  upgradeName: PacStudentSpeed
-  costPerLevel: 10
+  upgradeName: H
+  costsPerLevel: 64000000c80000002c010000e8030000
   maxLevel: 4
   upgradeValues:
-  - 6
-  - 7
-  - 8
-  - 10
+  - 0
+  - 1
+  - 2
+  - 4
   levelGridParent: {fileID: 999525826}
   levelUpButton: {fileID: 785351352}
   unfilledSprite: {fileID: -8357494700477734146, guid: 0bda35a1bbddb574b9c421529888c3c1, type: 3}
@@ -2526,6 +2534,8 @@ MonoBehaviour:
   buttonText: {fileID: 545163848}
   playerPrefMoneyKey: PlayerMoney
   playerPrefUpgradeKey: Upgrade_
+  updateDynamically: 1
+  updateInterval: 0.1
 --- !u!1 &1349795865
 GameObject:
   m_ObjectHideFlags: 0

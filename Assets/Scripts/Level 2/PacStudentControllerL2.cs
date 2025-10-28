@@ -9,6 +9,9 @@ public class PacStudentControllerL2 : MonoBehaviour
     public float cellSize = 1f;
     public float snapEps = 0.01f;
     public float teleportCooldown = 0.2f;
+    public GameObject pelletPrefab;
+    public float pelletSpeed = 12f;
+    public float pelletDistance = 1000f;
 
     private Vector2Int gridPos;
     private Vector2Int lastInput = Vector2Int.zero;
@@ -24,6 +27,10 @@ public class PacStudentControllerL2 : MonoBehaviour
     [SerializeField] private WallTilemapControllerL2 wallTilemap;
     private Vector2Int? lastWallHitDir = null;
     private Vector2Int facingDir = Vector2Int.right;
+
+    // Invulnerability system
+    private bool isInvulnerable = false;
+    public bool IsInvulnerable => isInvulnerable;
 
     public bool IsDead => animDriver != null ? animDriver.IsDead : false;
 
@@ -49,6 +56,7 @@ public class PacStudentControllerL2 : MonoBehaviour
     {
         if (animDriver.IsDead || GameManager.I.CurrentState == GameState.LevelCleared) return;
         ReadInput();
+        HandleShooting();
         var level = TilemapLevel2.I;
 
         if (!tweener.TweenExists(transform))
@@ -97,6 +105,29 @@ public class PacStudentControllerL2 : MonoBehaviour
 
         if (newInput != Vector2Int.zero)
             lastInput = newInput;
+    }
+
+    private void HandleShooting()
+    {
+        if (Input.GetKeyDown(KeyCode.UpArrow)) Shoot(Vector2.up);
+        else if (Input.GetKeyDown(KeyCode.DownArrow)) Shoot(Vector2.down);
+        else if (Input.GetKeyDown(KeyCode.LeftArrow)) Shoot(Vector2.left);
+        else if (Input.GetKeyDown(KeyCode.RightArrow)) Shoot(Vector2.right);
+    }
+
+    private void Shoot(Vector2 dir)
+    {
+        if ((pelletPrefab == null || tweener == null) || Level2Manager.I.BulletCount <= 0) return;
+
+        GameObject pellet = Instantiate(pelletPrefab, transform.position, Quaternion.identity);
+        Vector3 start = transform.position;
+        Vector3 end = start + (Vector3)(dir.normalized * pelletDistance);
+        float duration = pelletDistance / (pelletSpeed + PlayerPrefs.GetFloat("Upgrade_BS_Value", 0));
+        tweener.AddTween(pellet.transform, start, end, duration);
+        PelletL2 bullet = pellet.GetComponent<PelletL2>();
+        AudioManager.I?.PlaySfx(SfxEvent.Shoot, gameObject);
+        Level2Manager.I.UseBullet();
+        if (bullet != null) bullet.Init(Camera.main, duration);
     }
 
     private bool TryBeginMove(Vector2Int dir)
@@ -169,6 +200,16 @@ public class PacStudentControllerL2 : MonoBehaviour
         if (animDriver != null)
         {
             animDriver.StopAnimation();
+        }
+    }
+
+    public void SetInvulnerable(bool invulnerable)
+    {
+        isInvulnerable = invulnerable;
+        if (animDriver != null)
+        {
+            if (invulnerable) animDriver.StartBlinking();
+            else animDriver.StopBlinking();
         }
     }
 

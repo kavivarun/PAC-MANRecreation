@@ -4727,6 +4727,7 @@ MonoBehaviour:
   outsidePerimeter: {fileID: 4135587609309462137}
   BulletCollectPrefab: {fileID: 8445229892080261641, guid: 9bed6f9d0709e4e45993b7e99b5e8c0d, type: 3}
   LifeCollectPrefab: {fileID: 4851094549662895943, guid: e8651e34d5cf6a54e8e87e97da35d0d0, type: 3}
+  TeleportEffectPrefab: {fileID: 1979226476326144534, guid: d406c5e010b02464991e27bc48034292, type: 3}
   gridOrigin: {x: 0, y: 0}
   cellSize: 1
   bulletRespawnDelay: 5
